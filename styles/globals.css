@@ -1,0 +1,16 @@
+/* globals.css */
+/* Reinicios básicos */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  /* Fuente por defecto */
+  html,
+  body {
+    font-family: sans-serif;
+    background-color: #f7f7f7;
+    color: #333;
+  }
+  

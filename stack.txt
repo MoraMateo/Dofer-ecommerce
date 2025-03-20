@@ -1,0 +1,9 @@
+ Stack Tecnológico:
+✅ Next.js 15.2 – SSR, ISR y Server Actions para rendimiento.
+✅ Tailwind CSS – Estilos rápidos y personalizables.
+✅ WooCommerce API – Para manejar productos y pedidos.
+✅ React Query o SWR – Para gestionar datos de la API.
+✅ shadcn/ui – Para componentes preconstruidos con Tailwind.
+✅ Stripe o MercadoPago – Para pagos en línea.
+✅ NextAuth.js o Clerk – Para autenticación segura.
+✅ Zustand o Redux Toolkit – Para manejar el estado del carrito.

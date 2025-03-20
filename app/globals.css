@@ -1,4 +1,8 @@
-@import "tailwindcss";
+@import 'tailwindcss';
+
+@theme {
+  --color-dofer-blue: #1E3A5F;
+}
 
 /* Estilos globales extra */
 body {

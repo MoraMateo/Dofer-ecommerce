@@ -1,16 +1,70 @@
-/* globals.css */
-/* Reinicios básicos */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+/* 1) Importar Tailwind de forma “antigua” con @import */
+@import 'tailwindcss';
+
+/* 2) Definir variables de color con @theme */
+@theme {
+  --color-dofer-blue: #1E3A5F;
+  --color-dofer-yellow: #FBC02D;
+}
+
+/* 3) Ejemplo de estilos globales extra */
+body {
+  @apply bg-gray-50;
+  font-family: sans-serif;
+}
+
+/* 4) Animaciones personalizadas */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
   }
-  
-  /* Fuente por defecto */
-  html,
-  body {
-    font-family: sans-serif;
-    background-color: #f7f7f7;
-    color: #333;
+  to {
+    opacity: 1;
   }
-  
+}
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+/* 5) Variables para modo claro/oscuro */
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+/* 6) Inline theme variables */
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+/* 7) Modo oscuro por preferencia del sistema */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+/* 8) Aplicar variables de fondo/foreground */
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+/* 9) Clases personalizadas para usar tus variables */
+.bg-dofer-blue {
+  background-color: var(--color-dofer-blue) !important;
+}
+.text-dofer-blue {
+  color: var(--color-dofer-blue) !important;
+}
+.bg-dofer-yellow {
+  background-color: var(--color-dofer-yellow) !important;
+}
+.text-dofer-yellow {
+  color: var(--color-dofer-yellow) !important;
+}

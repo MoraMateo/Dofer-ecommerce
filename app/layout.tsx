@@ -30,9 +30,9 @@ export default function RootLayout({
             </div>
             <ul className="flex gap-6 font-medium">
               <li>
-                <p className="text-red transition">
+                <a className="text-dofer-blue transition">
                   Inicio
-                </p>
+                </a>
               </li>
               <li>
                 <a href="/shop" className="hover:text-dofer-blue transition">

@@ -17,3 +17,10 @@ export async function getProductById(id: string) {
   const { data } = await api.get(`/products/${id}`);
   return data;
 }
+
+export async function getCategories() {
+  // Ajusta a la ruta oficial de categorías de productos
+  // WooCommerce las expone en /products/categories
+  const { data } = await api.get("/products/categories");
+  return data;
+}

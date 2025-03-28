@@ -1,16 +1,29 @@
-"use client"; // Este componente usa hooks, por lo que debe ser un Client Component
+"use client";
 
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { useCartStore } from "@/store/cartStore";
+import AddToCartButton from "@/components/AddToCartButton";
+
+interface WooImage {
+  src: string;
+}
 
 interface Product {
   id: number;
   name: string;
-  price: string;
-  description: string;
-  images?: { src: string }[];
+  slug: string;
+  price: string;              // precio regular o precio final
+  regular_price?: string;     // precio regular
+  sale_price?: string;        // precio de oferta
+  description?: string;       // descripción larga (HTML)
+  short_description?: string; // descripción corta (HTML)
+  images?: WooImage[];
+  stock_status?: string;      // instock, outofstock, onbackorder
+  manage_stock?: boolean;
+  stock_quantity?: number;
+  sku?: string;
+  // Agrega más campos si lo requieres (type, categories, etc.)
 }
 
 interface ProductDetailClientProps {
@@ -18,69 +31,127 @@ interface ProductDetailClientProps {
 }
 
 export default function ProductDetailClient({ product }: ProductDetailClientProps) {
-  const addItem = useCartStore((state) => state.addItem);
-  const [quantity, setQuantity] = useState(1);
+  const [selectedImage, setSelectedImage] = useState(0);
 
-  const handleAddToCart = () => {
-    addItem({
-      id: product.id,
-      name: product.name,
-      price: parseFloat(product.price),
-      quantity: quantity,
-    });
-  };
+  // Si el producto maneja stock y está en stock, mostramos la cantidad disponible
+  const isInStock = product.stock_status === "instock";
+
+  // Obtenemos el precio a mostrar. Si sale_price existe, lo mostramos junto al regular_price tachado.
+  const hasSale = product.sale_price && product.sale_price !== "";
+  const finalPrice = hasSale ? product.sale_price : product.price;
+
+  // Manejamos múltiples imágenes. Si no hay, usamos un placeholder.
+  const images = product.images && product.images.length > 0 ? product.images : [{ src: "/placeholder.png" }];
 
   return (
-    <div className="flex flex-col md:flex-row gap-8">
-      {/* Sección de imagen del producto */}
-      <div className="relative w-full md:w-1/2 h-64 bg-white rounded-lg shadow p-4 overflow-hidden">
-        <Image
-          src={product.images?.[0]?.src || "/placeholder.png"}
-          alt={product.name}
-          fill
-          className="object-cover rounded-lg"
-        />
-      </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* Sección de imágenes */}
+        <div className="md:w-1/2 flex flex-col gap-4">
+          {/* Imagen principal */}
+          <div className="relative w-full h-80 bg-white rounded-lg shadow overflow-hidden">
+            <Image
+              src={images[selectedImage].src}
+              alt={product.name}
+              fill
+              className="object-cover"
+            />
+          </div>
 
-      {/* Sección de información */}
-      <div className="flex flex-col md:w-1/2">
-        <h1 className="text-3xl font-bold text-dofer-blue mb-2">
-          {product.name}
-        </h1>
-        <p className="text-xl text-gray-700 font-semibold mb-4">
-          ${product.price} USD
-        </p>
-        <div
-          className="text-gray-600 leading-relaxed mb-6"
-          dangerouslySetInnerHTML={{ __html: product.description }}
-        />
-
-        {/* Selección de cantidad */}
-        <div className="flex items-center gap-3 mb-6">
-          <label className="text-gray-700 font-medium">Cantidad:</label>
-          <input
-            type="number"
-            min="1"
-            value={quantity}
-            onChange={(e) => setQuantity(parseInt(e.target.value) || 1)}
-            className="w-16 border rounded px-2 py-1 focus:outline-dofer-blue"
-          />
+          {/* Miniaturas si hay más de 1 imagen */}
+          {images.length > 1 && (
+            <div className="flex gap-2 overflow-x-auto">
+              {images.map((img, index) => (
+                <button
+                  key={index}
+                  className={`relative w-20 h-20 bg-gray-100 rounded overflow-hidden 
+                    border-2 ${selectedImage === index ? "border-dofer-blue" : "border-transparent"}`}
+                  onClick={() => setSelectedImage(index)}
+                >
+                  <Image
+                    src={img.src}
+                    alt={`Thumbnail ${index}`}
+                    fill
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
-        {/* Botones de acción */}
-        <div className="flex flex-col sm:flex-row gap-4">
-          <button
-            onClick={handleAddToCart}
-            className="bg-dofer-blue text-white px-5 py-2 rounded hover:bg-dofer-yellow hover:text-dofer-blue transition"
-          >
-            Añadir al carrito
-          </button>
-          <Link
-            href="/shop"
-            className="inline-block border border-dofer-blue text-dofer-blue px-5 py-2 rounded hover:bg-dofer-blue hover:text-white transition"
-          >
-            Volver a la Tienda
-          </Link>
+        {/* Sección de información */}
+        <div className="md:w-1/2 flex flex-col">
+          <h1 className="text-3xl font-bold text-dofer-blue mb-2">{product.name}</h1>
+
+          {/* Precios */}
+          <div className="text-2xl font-semibold mb-4">
+            {hasSale ? (
+              <div className="flex items-center gap-2">
+                <span className="text-gray-500 line-through">
+                  ${product.regular_price}
+                </span>
+                <span className="text-dofer-blue">
+                  ${finalPrice} USD
+                </span>
+              </div>
+            ) : (
+              <span className="text-dofer-blue">
+                ${finalPrice} USD
+              </span>
+            )}
+          </div>
+
+          {/* Estado de Stock */}
+          {product.stock_status && (
+            <p
+              className={`text-sm font-medium mb-2 ${
+                isInStock ? "text-green-600" : "text-red-500"
+              }`}
+            >
+              {isInStock ? "En Stock" : "Agotado"}
+              {product.manage_stock && product.stock_quantity !== undefined && (
+                <span className="ml-2 text-gray-600">
+                  (Quedan {product.stock_quantity})
+                </span>
+              )}
+            </p>
+          )}
+
+          {/* Descripción corta */}
+          {product.short_description && (
+            <div
+              className="text-gray-700 leading-relaxed mb-4"
+              dangerouslySetInnerHTML={{ __html: product.short_description }}
+            />
+          )}
+
+          {/* Descripción larga */}
+          {product.description && (
+            <div
+              className="text-gray-600 leading-relaxed mb-6"
+              dangerouslySetInnerHTML={{ __html: product.description }}
+            />
+          )}
+
+          {/* SKU (opcional) */}
+          {product.sku && (
+            <p className="text-sm text-gray-500 mb-4">SKU: {product.sku}</p>
+          )}
+
+          {/* Botones de acción */}
+          <div className="flex flex-col sm:flex-row gap-4 mt-auto">
+            {/* Botón Agregar al Carrito */}
+            <AddToCartButton product={product} />
+
+            {/* Volver a la Tienda */}
+            <Link
+              href="/shop"
+              className="inline-block border border-dofer-blue text-dofer-blue px-4 py-2 rounded hover:bg-dofer-blue hover:text-white transition"
+            >
+              Volver a la Tienda
+            </Link>
+          </div>
         </div>
       </div>
     </div>

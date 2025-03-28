@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Toaster } from "react-hot-toast";
-import "./globals.css"; // Ajusta la ruta si corresponde
+import "./globals.css"; // Asegúrate de que globals.css esté en app/
 
 export default function RootLayout({
   children,
@@ -12,47 +12,112 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <html lang="es">
-      {/* 
-        Importante: flex-col y min-h-screen en <body> 
-        para que el contenido crezca y el footer quede al final.
-      */}
       <body className="flex flex-col min-h-screen">
         {/* Encabezado con menú */}
         <header className="bg-white shadow">
-          <nav className="container mx-auto flex items-center justify-between h-16 px-4">
-            {/* Logo + Nombre */}
-            <div className="flex items-center gap-2">
+          <nav className="container mx-auto flex items-center justify-between h-20 px-6">
+            {/* Logo y nombre */}
+            <div className="flex items-center gap-4">
               <Image
-                src="/dofer-logo.png" 
+                src="/dofer-logo.png" // Asegúrate de tener este archivo en public/
                 alt="Dofer Logo"
-                width={40}
-                height={40}
+                width={60}
+                height={60}
               />
               <Link
                 href="/"
-                className="text-2xl font-bold text-dofer-blue hover:text-dofer-yellow transition"
+                className="text-3xl font-bold text-dofer-blue hover:text-dofer-yellow transition"
               >
                 DOFER
               </Link>
             </div>
 
-            {/* Menú en pantallas medianas/grandes */}
-            <div className="hidden md:flex gap-6 font-medium">
-              <Link href="/shop" className="hover:text-dofer-blue transition">
-                Tienda
+            {/* Búsqueda (pantallas grandes) */}
+            <div className="hidden md:flex items-center gap-3">
+              {searchOpen && (
+                <input
+                  type="text"
+                  placeholder="Buscar productos..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="border rounded px-3 py-1 focus:outline-dofer-blue"
+                />
+              )}
+              <button
+                onClick={() => setSearchOpen(!searchOpen)}
+                className="p-2 hover:bg-gray-100 rounded"
+                aria-label="Buscar"
+              >
+                {/* Ícono de lupa */}
+                <svg
+                  className="w-6 h-6 text-dofer-blue"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </button>
+            </div>
+
+            {/* Barra de navegación en pantallas medianas/grandes */}
+            <div className="hidden md:flex items-center gap-6 font-medium">
+              <Link href="/shop" className="flex items-center gap-1 hover:text-dofer-blue transition">
+                {/* Ícono de tienda */}
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
+                  <circle cx="9" cy="21" r="1" />
+                  <circle cx="20" cy="21" r="1" />
+                </svg>
+                <span>Tienda</span>
               </Link>
-              <Link href="/cart" className="hover:text-dofer-blue transition">
-                Carrito
+              <Link href="/cart" className="flex items-center gap-1 hover:text-dofer-blue transition">
+                {/* Ícono de carrito */}
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
+                  <circle cx="9" cy="21" r="1" />
+                  <circle cx="20" cy="21" r="1" />
+                </svg>
+                <span>Carrito</span>
               </Link>
-              <Link href="#" className="hover:text-dofer-blue transition">
-                Contacto
+              <Link href="/contact" className="flex items-center gap-1 hover:text-dofer-blue transition">
+                {/* Ícono de contacto */}
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                  viewBox="0 0 24 24"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h12a2 2 0 012 2z" />
+                </svg>
+                <span>Contacto</span>
               </Link>
             </div>
 
-            {/* Botón hamburguesa en pantallas pequeñas */}
+            {/* Botón hamburguesa para pantallas pequeñas */}
             <button
               className="md:hidden focus:outline-none"
               onClick={() => setMenuOpen(!menuOpen)}
@@ -65,18 +130,23 @@ export default function RootLayout({
                 strokeWidth={2}
                 viewBox="0 0 24 24"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4 5h16M4 12h16M4 19h16"
-                />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 5h16M4 12h16M4 19h16" />
               </svg>
             </button>
           </nav>
 
-          {/* Menú desplegable en pantallas pequeñas */}
+          {/* Menú desplegable en móviles */}
           {menuOpen && (
             <div className="md:hidden bg-white shadow px-4 py-2">
+              <div className="flex items-center gap-2 mb-2">
+                <input
+                  type="text"
+                  placeholder="Buscar..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full border rounded px-3 py-1 focus:outline-dofer-blue"
+                />
+              </div>
               <Link
                 href="/shop"
                 className="block py-1 text-gray-700 hover:text-dofer-blue transition"
@@ -92,7 +162,7 @@ export default function RootLayout({
                 Carrito
               </Link>
               <Link
-                href="#"
+                href="/contact"
                 className="block py-1 text-gray-700 hover:text-dofer-blue transition"
                 onClick={() => setMenuOpen(false)}
               >
@@ -102,15 +172,12 @@ export default function RootLayout({
           )}
         </header>
 
-        {/* 
-          Contenido principal con flex-grow para 
-          ocupar todo el espacio vertical restante 
-        */}
+        {/* Contenido principal */}
         <main className="container mx-auto px-4 py-6 flex-grow">
           {children}
         </main>
 
-        {/* Footer pegado abajo */}
+        {/* Footer */}
         <footer className="bg-dofer-blue text-white py-4">
           <div className="container mx-auto text-center text-sm">
             &copy; {new Date().getFullYear()} DOFER. Todos los derechos reservados.

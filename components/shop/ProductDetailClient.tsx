@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import { useCartStore } from "@/store/cartStore";
-import AddToCartButton from "@/components/AddToCartButton";
+import AddToCartButton from "@/components/shop/AddToCartButton";
 
 interface Product {
   id: number;

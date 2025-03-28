@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import "./globals.css"; // Importa tus estilos globales
+import { Toaster } from "react-hot-toast";
+import "./globals.css"; // Ajusta la ruta si corresponde
 
 export default function RootLayout({
   children,
@@ -14,6 +15,10 @@ export default function RootLayout({
 
   return (
     <html lang="es">
+      {/* 
+        Importante: flex-col y min-h-screen en <body> 
+        para que el contenido crezca y el footer quede al final.
+      */}
       <body className="flex flex-col min-h-screen">
         {/* Encabezado con menú */}
         <header className="bg-white shadow">
@@ -21,7 +26,7 @@ export default function RootLayout({
             {/* Logo + Nombre */}
             <div className="flex items-center gap-2">
               <Image
-                src="/dofer-logo.png"
+                src="/dofer-logo.png" 
                 alt="Dofer Logo"
                 width={40}
                 height={40}
@@ -60,7 +65,11 @@ export default function RootLayout({
                 strokeWidth={2}
                 viewBox="0 0 24 24"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 5h16M4 12h16M4 19h16" />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M4 5h16M4 12h16M4 19h16"
+                />
               </svg>
             </button>
           </nav>
@@ -93,17 +102,23 @@ export default function RootLayout({
           )}
         </header>
 
-        {/* Contenido principal */}
+        {/* 
+          Contenido principal con flex-grow para 
+          ocupar todo el espacio vertical restante 
+        */}
         <main className="container mx-auto px-4 py-6 flex-grow">
           {children}
         </main>
 
-        {/* Footer */}
+        {/* Footer pegado abajo */}
         <footer className="bg-dofer-blue text-white py-4">
           <div className="container mx-auto text-center text-sm">
             &copy; {new Date().getFullYear()} DOFER. Todos los derechos reservados.
           </div>
         </footer>
+
+        {/* Toaster para notificaciones */}
+        <Toaster position="top-right" toastOptions={{ style: { zIndex: 9999 } }} />
       </body>
     </html>
   );

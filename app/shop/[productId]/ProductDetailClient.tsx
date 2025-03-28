@@ -3,7 +3,8 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import AddToCartButton from "@/components/AddToCartButton";
+import AddToCartButton from "@/components/shop/AddToCartButton";
+
 
 interface WooImage {
   src: string;

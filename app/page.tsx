@@ -1,5 +1,5 @@
-import HeroBanner from "@/components/HeroBanner";
-import CategoriesSection from "@/components/CategoriesSection";
+import CategoriesSection from "@/components/home/CategoriesSection";
+import HeroBanner from "@/components/home/HeroBanner";
 import { getCategories } from "@/services/wooCommerce";
 
 export default async function HomePage() {

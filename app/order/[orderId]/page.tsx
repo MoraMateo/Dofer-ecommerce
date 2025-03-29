@@ -1,36 +1,18 @@
 // app/order/[orderId]/page.tsx
+import React from "react";
+import OrderTracking from "@/components/OrderTracking";
 
-import { getOrderStatus } from "@/services/wooCommerce";
-
-// Define la forma de los datos del pedido, según WooCommerce
-interface Order {
-  id: number;
-  status: string;
-  // ... otras propiedades
-}
-
-interface OrderPageProps {
+interface OrderDetailPageProps {
   params: {
     orderId: string;
   };
 }
 
-export default async function OrderPage({ params }: OrderPageProps) {
-  const { orderId } = params;
-
-  // Llamamos directamente a la función en el servidor
-  // (No necesitamos fetch a /api/orders/..., podemos usar la función de wooCommerce)
-  const orderData: Order = await getOrderStatus(orderId);
-
-  if (!orderData) {
-    return <div>Pedido no encontrado</div>;
-  }
-
+export default function OrderDetailPage({ params }: OrderDetailPageProps) {
   return (
-    <div className="p-4">
-      <h1>Pedido #{orderData.id}</h1>
-      <p>Estado: {orderData.status}</p>
-      {/* Muestra más detalles del pedido si lo deseas */}
+    <div className="container mx-auto p-4">
+      <h1 className="text-3xl font-bold mb-6">Detalle del Pedido</h1>
+      <OrderTracking orderId={params.orderId} pollInterval={5000} />
     </div>
   );
 }

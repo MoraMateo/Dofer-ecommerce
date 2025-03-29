@@ -1,24 +1,36 @@
 // app/api/orders/[orderId]/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import { getOrderStatus } from "@/services/wooCommerce"; // Ajusta la ruta según tu proyecto
+import { NextResponse } from "next/server";
+import { getOrderStatus } from "@/services/wooCommerce";
 
-/**
- * Maneja las peticiones GET a /api/orders/[orderId].
- */
-export async function GET(
-  request: NextRequest,
-  context: { params: { orderId: string } }
-) {
-  const { orderId } = context.params;
+interface ContextParams {
+  params: {
+    orderId: string;
+  };
+}
 
+// GET /api/orders/[orderId]
+export async function GET(request: Request, { params }: ContextParams) {
   try {
-    // Llama a la función que obtiene el estado del pedido en WooCommerce
-    const orderData = await getOrderStatus(orderId);
-
-    // Devuelve los datos del pedido en formato JSON
-    return NextResponse.json(orderData, { status: 200 });
-  } catch (error) {
-    console.error("Error al obtener el estado del pedido:", error);
-    return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
+    const { orderId } = params;
+    const data = await getOrderStatus(orderId);
+    if (!data) {
+      return NextResponse.json({ error: "Pedido no encontrado" }, { status: 404 });
+    }
+    return NextResponse.json(data, { status: 200 });
+  } catch (error: any) {
+    console.error("Error en GET /api/orders/[orderId]:", error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
   }
+}
+
+// (Opcional) PUT /api/orders/[orderId]
+export async function PUT(request: Request, { params }: ContextParams) {
+  // Aquí manejarías la actualización de un pedido
+  return NextResponse.json({ message: "PUT /api/orders/[orderId] no implementado" }, { status: 501 });
+}
+
+// (Opcional) DELETE /api/orders/[orderId]
+export async function DELETE(request: Request, { params }: ContextParams) {
+  // Aquí manejarías la eliminación de un pedido
+  return NextResponse.json({ message: "DELETE /api/orders/[orderId] no implementado" }, { status: 501 });
 }

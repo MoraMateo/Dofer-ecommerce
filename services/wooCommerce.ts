@@ -2,10 +2,15 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://wp.dofer.com.mx/wp-json/wc/v3", // Ajusta a tu dominio de WooCommerce
+  baseURL: "https://wp.dofer.com.mx/wp-json/wc/v3", // Asegúrate de que esta URL es correcta para tu WooCommerce
   auth: {
     username: process.env.WC_CONSUMER_KEY || "",
     password: process.env.WC_CONSUMER_SECRET || "",
+  },
+  // Las claves se pasan en cada solicitud a través de params, sin quedar hardcodeadas en cada función
+  params: {
+    consumer_key: process.env.WC_CONSUMER_KEY,
+    consumer_secret: process.env.WC_CONSUMER_SECRET,
   },
 });
 
@@ -13,33 +18,54 @@ const api = axios.create({
 
 /**
  * Obtiene el estado de un pedido por su ID.
- * @param orderId - ID del pedido a consultar
+ * @param orderId - ID del pedido a consultar.
  */
 export async function getOrderStatus(orderId: string) {
   const endpoint = `/orders/${orderId}`;
   console.log("Requesting endpoint:", api.defaults.baseURL + endpoint);
-
   try {
     const { data } = await api.get(endpoint);
-    // Si data viene vacío o no contiene información, retornamos null
     if (!data || Object.keys(data).length === 0) {
       console.warn(`No se encontró información para el pedido ${orderId}`);
       return null;
     }
     return data;
   } catch (error: any) {
-    // Si se recibe un 404, no lanzamos error y retornamos null
     if (error.response && error.response.status === 404) {
       console.warn(`Pedido ${orderId} no encontrado (404)`);
       return null;
     }
-    // Para otros errores, logueamos y retornamos null
     console.error("Error fetching order status:", error);
     return null;
   }
 }
 
-// Ejemplo de más funciones para pedidos (opcional):
+/**
+ * Crea un nuevo pedido en WooCommerce.
+ * @param orderData - Objeto con los datos del pedido a crear.
+ * @returns Los datos del pedido creado o null en caso de error.
+ */
+export async function createOrder(orderData: any) {
+  try {
+    console.log("Enviando orderData:", JSON.stringify(orderData, null, 2));
+    // Se utiliza la instancia 'api' que ya envía las claves de forma automática
+    const { data } = await api.post("/orders", orderData);
+    return data;
+  } catch (error: any) {
+    console.error("Error creating order:");
+    if (error.response) {
+      console.error("Status:", error.response.status);
+      console.error("Data:", JSON.stringify(error.response.data, null, 2));
+      console.error("Headers:", JSON.stringify(error.response.headers, null, 2));
+    } else {
+      console.error("Error message:", error.message);
+    }
+    return null;
+  }
+}
+
+// ================== Pedidos (opcional) ==================
+
 export async function getOrders() {
   const { data } = await api.get("/orders");
   return data;

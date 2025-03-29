@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import { SessionProvider } from "next-auth/react"; // 👈 Importa SessionProvider
 
 export default function RootLayout({
   children,
@@ -148,7 +149,7 @@ export default function RootLayout({
 
         {/* Contenido principal */}
         <main className="container mx-auto px-4 py-6 flex-grow">
-          {children}
+        <SessionProvider>{children}</SessionProvider> {/* 👈 Aquí lo envolvemos */}
         </main>
 
         {/* Footer */}

@@ -24,7 +24,7 @@ export default function CategoriesSection({ categories }: CategoriesSectionProps
       <h2 className="text-3xl font-bold text-dofer-blue mb-8 text-center">
         CATEGORÍAS
       </h2>
-      <div className="container mx-auto grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
+      <div className="w-full px-4 md:px-8 xl:px-20 grid grid-cols-1 md:grid-cols-3 gap-6">
         {mainCategories.map((cat) => (
           <div
             key={cat.id}

@@ -26,7 +26,7 @@ export default function RootLayout({
       <body className="flex flex-col min-h-screen">
         {/* Encabezado */}
         <header className="bg-white shadow">
-          <nav className="container mx-auto flex items-center justify-between h-20 px-6">
+          <nav className="w-full flex items-center justify-between h-20 px-6 md:px-12 xl:px-20">
             {/* Logo */}
             <div className="flex items-center gap-4">
               <Image
@@ -79,9 +79,8 @@ export default function RootLayout({
             <div className="hidden md:flex items-center gap-6 font-medium">
               <Link href="/shop" className="flex items-center gap-1 hover:text-dofer-blue transition">
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
-                  <circle cx="9" cy="21" r="1" />
-                  <circle cx="20" cy="21" r="1" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 7l1-2h16l1 2v3a5 5 0 01-10 0 5 5 0 01-10 0V7z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 10v10h14V10" />
                 </svg>
                 <span>Tienda</span>
               </Link>
@@ -148,13 +147,13 @@ export default function RootLayout({
         </header>
 
         {/* Contenido principal */}
-        <main className="container mx-auto px-4 py-6 flex-grow">
-        <SessionProvider>{children}</SessionProvider> {/* 👈 Aquí lo envolvemos */}
+        <main className="w-full px-6 md:px-12 xl:px-20 py-6 flex-grow">
+          <SessionProvider>{children}</SessionProvider> {/* 👈 Aquí lo envolvemos */}
         </main>
 
         {/* Footer */}
         <footer className="bg-neutral-900 text-white py-12">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-4 gap-10">
+          <div className="w-full px-6 md:px-12 xl:px-20 grid grid-cols-1 md:grid-cols-4 gap-10">
 
             {/* DOFER Info */}
             <div>

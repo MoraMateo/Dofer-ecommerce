@@ -52,7 +52,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
             {product.name}
           </h1>
           <p className="text-xl text-gray-700 font-semibold mb-4">
-            ${product.price} USD
+            ${product.price} MXN
           </p>
           <div
             className="text-gray-600 leading-relaxed mb-6"

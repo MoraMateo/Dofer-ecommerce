@@ -124,3 +124,60 @@ export async function deleteCategory(id: string) {
   const { data } = await api.delete(`/products/categories/${id}`);
   return data;
 }
+
+interface WooCustomerPayload {
+  email: string;
+  first_name: string;
+  last_name: string;
+  username: string;
+  password: string;
+}
+
+export async function registerCustomer(payload: WooCustomerPayload) {
+  try {
+    const { data } = await api.post("/customers", payload);
+    return data;
+  } catch (error: any) {
+    const wooError = error.response?.data;
+    console.error("Error creando usuario WooCommerce:", wooError || error.message);
+    return wooError || null; // así puedes detectar `code: "registration-error-email-exists"`
+  }
+}
+
+interface WooLoginResponse {
+  token: string;
+  user_email: string;
+  user_nicename: string;
+  user_display_name: string;
+}
+
+export async function loginWoo(email: string, password: string) {
+  try {
+    console.log("🚀 Llamada a loginWoo con:", { email, password });
+    const { data } = await axios.post("https://wp.dofer.com.mx/wp-json/jwt-auth/v1/token", {
+      username: email,
+      password,
+    });
+    console.log("✅ Respuesta de WooCommerce:", data);
+    return data;
+  } catch (error: any) {
+    console.error("❌ loginWoo error:", error.response?.data || error.message);
+    return null;
+  }
+}
+
+
+export async function getCustomerOrdersWithToken(token: string) {
+  try {
+    const { data } = await axios.get("https://wp.dofer.com.mx/wp-json/wc/v3/orders", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return data;
+  } catch (error: any) {
+    console.error("Error obteniendo pedidos con token JWT:", error.response?.data || error.message);
+    return null;
+  }
+}

@@ -17,7 +17,7 @@ export default async function AdminProductsPage() {
         {products.map((product: any) => (
           <div key={product.id} className="bg-white rounded shadow p-4">
             <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
-            <p className="text-gray-600 mb-4">${product.price} USD</p>
+            <p className="text-gray-600 mb-4">${product.price} MXN</p>
             <Link
               href={`/admin/products/${product.id}`}
               className="inline-block bg-dofer-blue text-white px-3 py-1 rounded hover:bg-dofer-yellow transition text-sm"

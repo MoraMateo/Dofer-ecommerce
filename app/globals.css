@@ -2,7 +2,7 @@
 @import 'tailwindcss';
 
 /* 2) Definir variables de color con @theme */
-@theme {
+@theme { 
   --color-dofer-blue: #1E3A5F;
   --color-dofer-yellow: #FBC02D;
 }

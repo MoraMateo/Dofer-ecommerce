@@ -3,28 +3,26 @@
 import { useCartStore } from "@/store/cartStore";
 import Link from "next/link";
 import Image from "next/image";
+import { Trash2, ShoppingCart } from "lucide-react"; // opcional, si quieres usar íconos
 
 export default function CartPage() {
   const { items, removeItem, clearCart } = useCartStore();
-
-  // Calcula el total
   const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
-  // Función para eliminar un ítem
   const handleRemove = (id: number) => {
     removeItem(id);
   };
 
-  // Render del carrito vacío
   if (items.length === 0) {
     return (
-      <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold text-dofer-blue mb-4">Tu Carrito</h1>
-        <div className="bg-white rounded shadow p-6 text-center">
-          <p className="text-gray-600 mb-4">No hay productos en el carrito.</p>
+      <div className="container mx-auto px-4 py-20 text-center">
+        <h1 className="text-4xl font-extrabold text-dofer-blue mb-6">Tu Carrito</h1>
+        <div className="bg-white shadow-xl rounded-xl p-10 max-w-lg mx-auto">
+          <ShoppingCart className="mx-auto text-dofer-blue mb-4" size={40} />
+          <p className="text-gray-600 mb-6 text-lg">Aún no has agregado productos.</p>
           <Link
             href="/shop"
-            className="inline-block bg-dofer-blue text-white px-4 py-2 rounded hover:bg-dofer-yellow hover:text-dofer-blue transition"
+            className="inline-block px-6 py-3 bg-dofer-blue text-white rounded-lg hover:bg-dofer-yellow hover:text-dofer-blue transition font-semibold text-base"
           >
             Ir a la Tienda
           </Link>
@@ -33,84 +31,66 @@ export default function CartPage() {
     );
   }
 
-  // Render del carrito con ítems
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold text-dofer-blue mb-6">Tu Carrito</h1>
-      <div className="bg-white rounded shadow p-4 mb-6">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="border-b">
-              <tr className="text-left text-gray-700">
-                <th className="py-2 px-2">Producto</th>
-                <th className="py-2 px-2 hidden sm:table-cell">Precio</th>
-                <th className="py-2 px-2">Cantidad</th>
-                <th className="py-2 px-2 text-right">Subtotal</th>
-                <th className="py-2 px-2"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {items.map((item) => {
-                const subtotal = item.price * item.quantity;
-                return (
-                  <tr key={item.id} className="border-b last:border-none">
-                    <td className="py-4 px-2">
-                      <div className="flex items-center gap-2">
-                        {/* Imagen del producto si existe */}
-                        <div className="w-16 h-16 bg-gray-100 relative rounded hidden sm:block">
-                          <Image
-                            src={item.image || "/placeholder.png"}
-                            alt={item.name}
-                            fill
-                            className="object-cover rounded"
-                          />
-                        </div>
-                        <span className="font-medium text-gray-800">
-                          {item.name}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="py-4 px-2 hidden sm:table-cell">
-                      <span>${item.price.toFixed(2)}</span>
-                    </td>
-                    <td className="py-4 px-2">
-                      {/* Cantidad (solo se muestra, no editable) */}
-                      <span>{item.quantity}</span>
-                    </td>
-                    <td className="py-4 px-2 text-right">
-                      <span>${subtotal.toFixed(2)}</span>
-                    </td>
-                    <td className="py-4 px-2 text-right">
-                      <button
-                        onClick={() => handleRemove(item.id)}
-                        className="text-red-500 hover:text-red-600 text-sm"
-                      >
-                        Eliminar
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+    <div className="container mx-auto px-4 py-14">
+      <h1 className="text-4xl font-extrabold text-gray-900 mb-10">Tu Carrito</h1>
+
+      <div className="space-y-6">
+        {items.map((item) => {
+          const subtotal = item.price * item.quantity;
+          return (
+            <div
+              key={item.id}
+              className="bg-white rounded-xl shadow-md p-6 flex flex-col sm:flex-row sm:items-center gap-6 hover:shadow-lg transition"
+            >
+              <div className="w-28 h-28 relative bg-gray-100 rounded-lg overflow-hidden flex-shrink-0 mx-auto sm:mx-0">
+                <Image
+                  src={item.image || "/placeholder.png"}
+                  alt={item.name}
+                  fill
+                  className="object-cover"
+                />
+              </div>
+
+              <div className="flex-1 w-full">
+                <h2 className="text-xl font-semibold text-gray-800 mb-1">{item.name}</h2>
+                <p className="text-gray-500 text-sm">
+                  Precio unitario: <span className="font-medium">${item.price.toFixed(2)} MXN</span>
+                </p>
+                <p className="text-gray-500 text-sm">
+                  Cantidad: <span className="font-medium">{item.quantity}</span>
+                </p>
+                <p className="mt-2 text-dofer-blue font-bold text-lg">
+                  Subtotal: ${subtotal.toFixed(2)}
+                </p>
+              </div>
+
+              <button
+                onClick={() => handleRemove(item.id)}
+                className="text-red-500 hover:text-red-600 text-sm flex items-center gap-1"
+              >
+                <Trash2 size={16} /> Eliminar
+              </button>
+            </div>
+          );
+        })}
       </div>
 
-      {/* Resumen final */}
-      <div className="bg-white rounded shadow p-4 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="text-lg font-semibold text-gray-800">
+      {/* Resumen */}
+      <div className="bg-white rounded-xl shadow-md p-6 mt-12 flex flex-col sm:flex-row justify-between items-center gap-6">
+        <p className="text-2xl font-bold text-gray-900">
           Total: <span className="text-dofer-blue">${total.toFixed(2)}</span>
         </p>
-        <div className="flex gap-3">
+        <div className="flex gap-4">
           <button
             onClick={clearCart}
-            className="bg-red-100 text-red-600 px-3 py-2 rounded hover:bg-red-200 transition text-sm"
+            className="bg-red-100 text-red-600 px-5 py-2.5 rounded-lg hover:bg-red-200 transition font-medium text-sm"
           >
             Vaciar Carrito
           </button>
           <Link
             href="/shop"
-            className="bg-dofer-blue text-white px-4 py-2 rounded hover:bg-dofer-yellow hover:text-dofer-blue transition text-sm"
+            className="bg-dofer-blue text-white px-5 py-2.5 rounded-lg hover:bg-dofer-yellow hover:text-dofer-blue transition font-medium text-sm"
           >
             Seguir Comprando
           </Link>

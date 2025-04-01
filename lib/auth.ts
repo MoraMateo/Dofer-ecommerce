@@ -1,31 +1,46 @@
-// lib/auth.ts
-import { NextAuthOptions } from "next-auth";
+// Archivo: next-auth.config.ts
 import CredentialsProvider from "next-auth/providers/credentials";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
-import prisma from "@/prisma"; // Asegúrate que existe este archivo también
-import bcrypt from "bcryptjs";
+import { loginWoo } from "@/services/wooCommerce";
+import type { AuthOptions } from "next-auth";
 
-export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
+export const authOptions: AuthOptions = {
+  secret: process.env.NEXTAUTH_SECRET,
   providers: [
     CredentialsProvider({
-      name: "Credenciales",
+      name: "Credenciales WooCommerce",
+      // Opcional: puedes agregar id: "credentials"
       credentials: {
         email: { label: "Email", type: "email" },
         password: { label: "Contraseña", type: "password" },
       },
       async authorize(credentials) {
-        const user = await prisma.user.findUnique({
-          where: { email: credentials?.email },
-        });
+        if (!credentials) {
+          console.log("⚠️ No credentials received");
+          return null;
+        }
 
-        if (!user || !credentials?.password) return null;
+        console.log("🔐 Iniciando login con Woo para:", credentials.email);
+        console.log("🟡 Password recibido:", credentials.password);
 
-        const isValid = await bcrypt.compare(credentials.password, user.password);
+        const woo = await loginWoo(credentials.email, credentials.password);
+        console.log("📦 Respuesta de loginWoo:", woo);
 
-        if (!isValid) return null;
+        if (!woo) {
+          console.log("❌ Respuesta nula de loginWoo");
+          return null;
+        }
+        
+        if (!woo.token) {
+          console.log("❌ Token faltante en la respuesta:", woo);
+          return null;
+        }
 
-        return user;
+        return {
+          id: woo.user_email,
+          name: woo.user_display_name,
+          email: woo.user_email,
+          wooToken: woo.token,
+        };
       },
     }),
   ],
@@ -37,12 +52,20 @@ export const authOptions: NextAuthOptions = {
   },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        token.id = user.id;
+        token.name = user.name;
+        token.email = user.email;
+        token.wooToken = user.wooToken; 
+      }
       return token;
     },
     async session({ session, token }) {
       if (session.user) {
-        session.user.id = token.id as string;
+        session.user.id = token.id;
+        session.user.name = token.name;
+        session.user.email = token.email;
+        session.user.wooToken = token.wooToken;
       }
       return session;
     },

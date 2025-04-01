@@ -1,11 +1,12 @@
+// layout.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Toaster } from "react-hot-toast";
+import { SessionProvider } from "next-auth/react";
 import "./globals.css";
-import { SessionProvider } from "next-auth/react"; // 👈 Importa SessionProvider
 
 export default function RootLayout({
   children,
@@ -24,47 +25,41 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className="flex flex-col min-h-screen">
-        {/* Encabezado */}
-        <header className="bg-white shadow">
-          <nav className="w-full flex items-center justify-between h-20 px-6 md:px-12 xl:px-20">
+        {/* Header */}
+        <header className="bg-white shadow z-40 sticky top-0 md:fixed md:w-full">
+          <nav className="w-full flex items-center justify-between gap-4 h-auto md:h-20 px-4 sm:px-6 md:px-12 xl:px-20 py-3 md:py-0">
             {/* Logo */}
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 min-w-fit">
               <Image
-                src="/dofer-logo.png"
+                src="/dofer-logo-sintexto.svg"
                 alt="Dofer Logo"
-                width={60}
-                height={60}
+                width={30}
+                height={30}
               />
               <Link
                 href="/"
-                className="text-3xl font-bold text-dofer-blue hover:text-dofer-yellow transition"
+                className="text-2xl sm:text-3xl font-bold text-dofer-blue hover:text-dofer-yellow transition"
               >
                 DOFER
               </Link>
             </div>
 
-            {/* Búsqueda escritorio */}
-            <div className="hidden md:flex items-center gap-3">
-              {searchOpen && (
+            {/* Centro: Búsqueda */}
+            <div className="flex-1 hidden md:flex items-center max-w-lg mx-4">
+              <div className="flex items-center bg-gray-100 rounded-lg px-4 w-full">
                 <input
                   type="text"
                   placeholder="Buscar productos..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="border rounded px-3 py-1 focus:outline-dofer-blue"
+                  className="bg-transparent flex-grow py-2 text-sm focus:outline-none"
                 />
-              )}
-              <button
-                onClick={() => setSearchOpen(!searchOpen)}
-                className="p-2 hover:bg-gray-100 rounded"
-                aria-label="Buscar"
-              >
                 <svg
-                  className="w-6 h-6 text-dofer-blue"
+                  className="w-6 h-6 text-gray-500"
                   fill="none"
-                  stroke="currentColor"
-                  strokeWidth={2}
                   viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
                 >
                   <path
                     strokeLinecap="round"
@@ -72,141 +67,128 @@ export default function RootLayout({
                     d="M21 21l-4.35-4.35m1.35-5.65a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
+              </div>
+            </div>
+
+            {/* Mobile menu toggle */}
+            <div className="md:hidden">
+              <button
+                onClick={() => setMenuOpen(!menuOpen)}
+                className="text-dofer-blue focus:outline-none"
+                aria-label="Menú móvil"
+              >
+                <svg
+                  className="w-7 h-7"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
               </button>
             </div>
 
-            {/* Menú escritorio */}
-            <div className="hidden md:flex items-center gap-6 font-medium">
-              <Link href="/shop" className="flex items-center gap-1 hover:text-dofer-blue transition">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 7l1-2h16l1 2v3a5 5 0 01-10 0 5 5 0 01-10 0V7z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 10v10h14V10" />
+            {/* Navegación derecha (desktop) */}
+            <div className="hidden md:flex items-center gap-6 font-medium min-w-fit">
+              <Link href="/profile" className="flex flex-col items-center text-xs hover:text-dofer-blue md:text-sm">
+                <svg className="w-7 h-7 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4 20c0-2.21 3.58-4 8-4s8 1.79 8 4" />
                 </svg>
-                <span>Tienda</span>
+                <span className="hidden md:inline">Perfil</span>
               </Link>
-              <Link href="/cart" className="flex items-center gap-1 hover:text-dofer-blue transition">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+              <Link href="/shop" className="flex flex-col items-center text-xs hover:text-dofer-blue md:text-sm">
+                <svg className="w-7 h-7 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h18M4 7h16l-1.5 9H5.5L4 7z" />
+                  <circle cx="9" cy="20" r="1" />
+                  <circle cx="18" cy="20" r="1" />
+                </svg>
+                <span className="hidden md:inline">Tienda</span>
+              </Link>
+              <Link href="/quotes" className="flex flex-col items-center text-xs hover:text-dofer-blue md:text-sm">
+                <svg className="w-7 h-7 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 8h10M7 12h4m1 8h2a2 2 0 002-2V8a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2h2z" />
+                </svg>
+                <span className="hidden md:inline">Cotizar</span>
+              </Link>
+              <Link href="/cart" className="flex flex-col items-center text-xs hover:text-dofer-blue md:text-sm">
+                <svg className="w-7 h-7 mb-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
                   <path strokeLinecap="round" strokeLinejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4" />
                   <circle cx="9" cy="21" r="1" />
                   <circle cx="20" cy="21" r="1" />
                 </svg>
-                <span>Carrito</span>
-              </Link>
-              <Link href="/quotes" className="flex items-center gap-1 hover:text-dofer-blue transition">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 17v-6h13M3 6h18M3 12h6M3 18h6" />
-                </svg>
-                <span>Cotizar</span>
-              </Link>
-              <Link href="/contact" className="flex items-center gap-1 hover:text-dofer-blue transition">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h12a2 2 0 012 2z" />
-                </svg>
-                <span>Contacto</span>
+                <span className="hidden md:inline">Carrito</span>
               </Link>
             </div>
-
-            {/* Menú hamburguesa */}
-            <button
-              className="md:hidden focus:outline-none"
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="Abrir menú"
-            >
-              <svg className="w-6 h-6 text-dofer-blue" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 5h16M4 12h16M4 19h16" />
-              </svg>
-            </button>
           </nav>
 
-          {/* Menú móvil */}
+          {/* Menú móvil desplegable */}
           {menuOpen && (
-            <div className="md:hidden bg-white shadow px-4 py-2">
-              <div className="flex items-center gap-2 mb-2">
-                <input
-                  type="text"
-                  placeholder="Buscar..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full border rounded px-3 py-1 focus:outline-dofer-blue"
-                />
+            <div className="md:hidden bg-white shadow px-4 pt-2 pb-4 animate-slide-down">
+              <div className="flex flex-col space-y-4 items-start">
+                <Link href="/profile" className="flex items-center gap-2 text-dofer-blue" onClick={() => setMenuOpen(false)}>
+                  👤 <span>Perfil</span>
+                </Link>
+                <Link href="/shop" className="flex items-center gap-2 text-dofer-blue" onClick={() => setMenuOpen(false)}>
+                  🛒 <span>Tienda</span>
+                </Link>
+                <Link href="/quotes" className="flex items-center gap-2 text-dofer-blue" onClick={() => setMenuOpen(false)}>
+                  🧾 <span>Cotizar</span>
+                </Link>
+                <Link href="/cart" className="flex items-center gap-2 text-dofer-blue" onClick={() => setMenuOpen(false)}>
+                  🧺 <span>Carrito</span>
+                </Link>
               </div>
-              <Link href="/shop" className="block py-1 text-gray-700 hover:text-dofer-blue transition" onClick={() => setMenuOpen(false)}>
-                Tienda
-              </Link>
-              <Link href="/cart" className="block py-1 text-gray-700 hover:text-dofer-blue transition" onClick={() => setMenuOpen(false)}>
-                Carrito
-              </Link>
-              <Link href="/quotes" className="block py-1 text-gray-700 hover:text-dofer-blue transition" onClick={() => setMenuOpen(false)}>
-                Cotizar
-              </Link>
-              <Link href="/contact" className="block py-1 text-gray-700 hover:text-dofer-blue transition" onClick={() => setMenuOpen(false)}>
-                Contacto
-              </Link>
             </div>
           )}
         </header>
 
         {/* Contenido principal */}
-        <main className="w-full px-6 md:px-12 xl:px-20 py-6 flex-grow">
-          <SessionProvider>{children}</SessionProvider> {/* 👈 Aquí lo envolvemos */}
+        <main className="w-full px-4 sm:px-6 md:px-12 xl:px-20 pt-28 pb-6 flex-grow">
+          <SessionProvider>{children}</SessionProvider>
         </main>
 
-        {/* Footer */}
-        <footer className="bg-neutral-900 text-white py-12">
-          <div className="w-full px-6 md:px-12 xl:px-20 grid grid-cols-1 md:grid-cols-4 gap-10">
-
-            {/* DOFER Info */}
+        {/* Footer Mejorado */}
+        <footer className="bg-neutral-900 text-white pt-12 pb-6">
+          <div className="w-full px-6 md:px-12 xl:px-20 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
             <div>
-              <h2 className="text-2xl font-bold tracking-wide text-white mb-4">DOFER</h2>
+              <h2 className="text-2xl font-bold tracking-wide mb-4">DOFER</h2>
               <p className="text-sm text-neutral-400 leading-relaxed">
                 Especialistas en impresión 3D y soluciones tecnológicas. Calidad y personalización en cada proyecto.
               </p>
             </div>
-
-            {/* Navegación */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Navegación</h3>
+              <h3 className="text-lg font-semibold mb-4">Navegación</h3>
               <ul className="space-y-2 text-sm text-neutral-300">
-                <li><a href="/shop" className="hover:text-white transition">Tienda</a></li>
-                <li><a href="/cart" className="hover:text-white transition">Carrito</a></li>
-                <li><a href="/quotes" className="hover:text-white transition">Cotizar</a></li>
-                <li><a href="/contact" className="hover:text-white transition">Contacto</a></li>
+                <li><Link href="/profile" className="hover:text-white transition">👤 Perfil</Link></li>
+                <li><Link href="/shop" className="hover:text-white transition">🛒 Tienda</Link></li>
+                <li><Link href="/cart" className="hover:text-white transition">🧺 Carrito</Link></li>
+                <li><Link href="/quotes" className="hover:text-white transition">🧾 Cotizar</Link></li>
               </ul>
             </div>
-
-            {/* Contacto */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Contáctanos</h3>
-              <p className="flex items-center gap-2 text-sm text-neutral-300 mb-2">
-                <span>📧</span> contacto@dofer.com.mx
-              </p>
-              <p className="flex items-center gap-2 text-sm text-neutral-300">
-                <span>📞</span> +52 981 199 1564
-              </p>
+              <h3 className="text-lg font-semibold mb-4">Contáctanos</h3>
+              <p className="flex items-center gap-2 text-sm text-neutral-300 mb-2">📧 contacto@dofer.com.mx</p>
+              <p className="flex items-center gap-2 text-sm text-neutral-300">📞 +52 981 199 1564</p>
             </div>
-
-            {/* Redes Sociales */}
             <div>
-              <h3 className="text-lg font-semibold text-white mb-4">Síguenos</h3>
-              <div className="flex space-x-4 text-neutral-300">
-                <a href="https://facebook.com" target="_blank" rel="noreferrer" className="hover:text-white transition text-xl">
-                  <i className="fab fa-facebook-f"></i>
-                </a>
-                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-white transition text-xl">
-                  <i className="fab fa-instagram"></i>
-                </a>
-                {/* Puedes agregar más iconos como X, LinkedIn, TikTok... */}
+              <h3 className="text-lg font-semibold mb-4">Síguenos</h3>
+              <div className="flex gap-4 text-neutral-300 text-xl">
+                <a href="https://facebook.com" target="_blank" rel="noreferrer" className="hover:text-white transition">📘</a>
+                <a href="https://instagram.com" target="_blank" rel="noreferrer" className="hover:text-white transition">📸</a>
               </div>
             </div>
           </div>
-
-          {/* Línea inferior */}
           <div className="mt-10 border-t border-neutral-800 pt-6 text-center text-xs text-neutral-500">
-            &copy; {new Date().getFullYear()} DOFER. Todos los derechos reservados.
+            &copy; {currentYear} DOFER. Todos los derechos reservados.
           </div>
         </footer>
 
-        {/* Notificaciones */}
         <Toaster position="top-right" toastOptions={{ style: { zIndex: 9999 } }} />
       </body>
     </html>

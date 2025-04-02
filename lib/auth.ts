@@ -1,40 +1,27 @@
-// Archivo: next-auth.config.ts
+import NextAuth from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { loginWoo } from "@/services/wooCommerce";
-import type { AuthOptions } from "next-auth";
+import { loginWoo } from "@/services/wooCommerce"; // Asegúrate de que la ruta es correcta
+import type { NextAuthOptions } from "next-auth";
 
-export const authOptions: AuthOptions = {
-  secret: process.env.NEXTAUTH_SECRET,
+export const authOptions: NextAuthOptions = {
   providers: [
     CredentialsProvider({
       name: "Credenciales WooCommerce",
-      // Opcional: puedes agregar id: "credentials"
       credentials: {
-        email: { label: "Email", type: "email" },
+        email: { label: "Email", type: "email", placeholder: "email@example.com" },
         password: { label: "Contraseña", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials) {
-          console.log("⚠️ No credentials received");
-          return null;
-        }
-
-        console.log("🔐 Iniciando login con Woo para:", credentials.email);
-        console.log("🟡 Password recibido:", credentials.password);
-
+        if (!credentials?.email || !credentials?.password) return null;
+        
+        // Llamada a la función loginWoo para autenticar contra WooCommerce
         const woo = await loginWoo(credentials.email, credentials.password);
-        console.log("📦 Respuesta de loginWoo:", woo);
-
-        if (!woo) {
-          console.log("❌ Respuesta nula de loginWoo");
+        if (!woo || !woo.token) {
+          console.log("❌ Token faltante o respuesta inválida de WooCommerce:", woo);
           return null;
         }
         
-        if (!woo.token) {
-          console.log("❌ Token faltante en la respuesta:", woo);
-          return null;
-        }
-
+        // Retornamos los datos del usuario con el token de WooCommerce
         return {
           id: woo.user_email,
           name: woo.user_display_name,
@@ -44,30 +31,29 @@ export const authOptions: AuthOptions = {
       },
     }),
   ],
-  session: {
-    strategy: "jwt",
-  },
   pages: {
     signIn: "/auth/signin",
+  },
+  session: {
+    strategy: "jwt",
   },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
-        token.name = user.name;
-        token.email = user.email;
-        token.wooToken = user.wooToken; 
+        token.wooToken = user.wooToken;
       }
       return token;
     },
     async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.id;
-        session.user.name = token.name;
-        session.user.email = token.email;
-        session.user.wooToken = token.wooToken;
-      }
+      session.user.id = token.id as string;
+      session.user.wooToken = token.wooToken;
       return session;
     },
   },
+  secret: process.env.NEXTAUTH_SECRET,
 };
+
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };

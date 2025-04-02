@@ -3,7 +3,7 @@
 import { useCartStore } from "@/store/cartStore";
 import Link from "next/link";
 import Image from "next/image";
-import { Trash2, ShoppingCart } from "lucide-react"; // opcional, si quieres usar íconos
+import { Trash2, ShoppingCart } from "lucide-react";
 
 export default function CartPage() {
   const { items, removeItem, clearCart } = useCartStore();
@@ -26,6 +26,13 @@ export default function CartPage() {
           >
             Ir a la Tienda
           </Link>
+          <Link
+            href="/checkout"
+            className="bg-dofer-blue text-white px-5 py-2.5 rounded-lg hover:bg-dofer-yellow hover:text-dofer-blue transition font-medium text-sm"
+          >
+            Ir a Checkout
+          </Link>
+
         </div>
       </div>
     );
@@ -82,12 +89,13 @@ export default function CartPage() {
           Total: <span className="text-dofer-blue">${total.toFixed(2)}</span>
         </p>
         <div className="flex gap-4">
-          <button
-            onClick={clearCart}
-            className="bg-red-100 text-red-600 px-5 py-2.5 rounded-lg hover:bg-red-200 transition font-medium text-sm"
+          <Link
+            href="/checkout"
+            className="bg-dofer-blue text-white px-5 py-2.5 rounded-lg hover:bg-dofer-yellow hover:text-dofer-blue transition font-medium text-sm"
           >
-            Vaciar Carrito
-          </button>
+            Pagar Pedido
+          </Link>
+
           <Link
             href="/shop"
             className="bg-dofer-blue text-white px-5 py-2.5 rounded-lg hover:bg-dofer-yellow hover:text-dofer-blue transition font-medium text-sm"

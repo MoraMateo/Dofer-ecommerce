@@ -6,7 +6,7 @@ import UpdateBillingForm, { Billing } from "./UpdateBillingForm";
 interface UpdateBillingSectionProps {
   wooToken?: string;
   initialBilling?: Billing;
-  userEmail: string; // Nuevo: email del usuario
+  userEmail: string;
 }
 
 export default function UpdateBillingSection({ wooToken, initialBilling, userEmail }: UpdateBillingSectionProps) {
@@ -35,7 +35,7 @@ export default function UpdateBillingSection({ wooToken, initialBilling, userEma
       {showForm && (
         <UpdateBillingForm
           wooToken={wooToken}
-          userEmail={userEmail}  // Pasamos el email
+          userEmail={userEmail}
           initialBilling={currentBilling}
           onUpdate={(newBilling: Billing) => {
             setCurrentBilling(newBilling);

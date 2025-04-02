@@ -181,3 +181,20 @@ export async function getCustomerOrdersWithToken(token: string) {
     return null;
   }
 }
+
+export async function getWooCustomer(email: string) {
+  try {
+    const { data } = await api.get("/customers", {
+      params: { email },
+    });
+    
+    // data es un array; si existe al menos un cliente, devolvemos el primero
+    if (Array.isArray(data) && data.length > 0) {
+      return data[0];
+    }
+    return null;
+  } catch (error: any) {
+    console.error("Error obteniendo datos del cliente (me):", error.response?.data || error.message);
+    return null;
+  }
+}

@@ -1,11 +1,15 @@
 // app/profile/page.tsx
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
-import { getOrders } from "@/services/wooCommerce";
-import Image from "next/image";
+import { getOrders, getWooCustomer } from "@/services/wooCommerce";
 import Link from "next/link";
+import { renderAddress } from "@/utils/renderAddress";
+
+// Importamos nuestro componente cliente:
+import UpdateBillingSection from "@/components/UpdateBillingSection";
 
 export default async function ProfilePage() {
+  // Obtenemos la sesión en el servidor
   const session = await getServerSession(authOptions);
   const user = session?.user;
 
@@ -20,37 +24,46 @@ export default async function ProfilePage() {
     );
   }
 
+  // Obtenemos los pedidos y datos de WooCommerce
   const orders = await getOrders();
+  let wooCustomer = null;
+  if (user.email) {
+    wooCustomer = await getWooCustomer(user.email);
+  }
+
+  const billing = wooCustomer?.billing;
 
   return (
-    <div className="max-w-5xl mx-auto p-6">
-      <h1 className="text-3xl font-bold mb-6">👤 Mi Perfil</h1>
+    <div className="max-w-5xl mx-auto p-6 space-y-8">
+      <h1 className="text-3xl font-bold">👤 Mi Perfil</h1>
 
-      <div className="bg-white rounded-2xl shadow p-6 grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="flex items-center justify-center">
-          <Image
-            src={user.image || "/default-avatar.png"}
-            alt="Avatar"
-            width={120}
-            height={120}
-            className="rounded-full border shadow"
-          />
-        </div>
-        <div className="md:col-span-2">
-          <p className="text-xl font-semibold">{user.name || "Usuario"}</p>
-          <p className="text-gray-600">{user.email}</p>
-          <p className="mt-2 text-sm text-gray-500">Miembro desde 2024</p>
-        </div>
+      {/* Datos básicos del usuario */}
+      <div className="bg-white rounded-2xl shadow p-6">
+        <p className="text-xl font-semibold">{user.name || "Usuario"}</p>
+        <p className="text-gray-600">{user.email}</p>
       </div>
 
+      {/* Sección de dirección de facturación */}
+      <div className="bg-white rounded-2xl shadow p-6">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-semibold">📍 Dirección de Facturación</h2>
+        </div>
+        {renderAddress(billing, "No hay dirección de facturación registrada.")}
+      </div>
+
+      {/* Componente para actualizar la dirección de facturación */}
+      <UpdateBillingSection wooToken={user.wooToken} initialBilling={billing} />
+
+      {/* Sección de pedidos */}
       <div>
         <h2 className="text-2xl font-semibold mb-4">🛒 Mis Pedidos</h2>
         <div className="space-y-4">
           {orders?.length > 0 ? (
             orders.map((order: any) => (
-              <div
+              <Link
                 key={order.id}
-                className="border rounded-xl p-4 flex justify-between items-center shadow-sm bg-white"
+                href={`/profile/orders/${order.id}`}
+                className="block border rounded-xl p-4 flex justify-between items-center shadow-sm bg-white hover:bg-gray-50 transition"
               >
                 <div>
                   <p className="font-medium">Pedido #{order.id}</p>
@@ -60,7 +73,7 @@ export default async function ProfilePage() {
                 <div className="text-sm text-gray-400">
                   {new Date(order.date_created).toLocaleDateString("es-MX")}
                 </div>
-              </div>
+              </Link>
             ))
           ) : (
             <p className="text-gray-500">Aún no tienes pedidos registrados.</p>

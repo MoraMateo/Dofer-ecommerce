@@ -25,7 +25,7 @@ export default function SignInForm() {
       // Puedes esperar a que la sesión se actualice
       setTimeout(() => {
         console.log("📦 Token JWT Woo:", session?.user?.wooToken);
-        router.push("/dashboard");
+        router.push("/profile");
       }, 500);
     } else {
       console.log("🔴 Login fallido:", result?.error);

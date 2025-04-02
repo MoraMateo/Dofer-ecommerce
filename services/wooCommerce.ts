@@ -198,3 +198,41 @@ export async function getWooCustomer(email: string) {
     return null;
   }
 }
+
+export async function updateCustomerBilling(email: string, billing: any, wooToken: string) {
+  // Normalizar el objeto billing
+  const normalizedBilling = {
+    first_name: billing.first_name || "",
+    last_name: billing.last_name || "",
+    address_1: billing.address_1 || "",
+    address_2: billing.address_2 || "",
+    city: billing.city || "",
+    state: billing.state || "",
+    postcode: billing.postcode || "",
+    country: billing.country || "",
+    phone: billing.phone || ""
+  };
+
+  // Validar campos obligatorios
+  const requiredFields = ["first_name", "last_name", "address_1", "city", "postcode", "country"];
+  for (const field of requiredFields) {
+    if (!normalizedBilling[field as keyof typeof normalizedBilling]) {
+      throw new Error(`El campo ${field} es obligatorio.`);
+    }
+  }
+
+  // Buscar al cliente por email usando la instancia "api" que tiene las credenciales (consumer key/secret)
+  const searchRes = await api.get("/customers", {
+    params: { email },
+  });
+  const foundCustomers = searchRes.data;
+  if (!Array.isArray(foundCustomers) || foundCustomers.length === 0) {
+    throw new Error("No se encontró el cliente con ese email");
+  }
+  const customerId = foundCustomers[0].id;
+
+  // Actualizar la dirección de facturación del cliente
+  const response = await api.put(`/customers/${customerId}`, { billing: normalizedBilling });
+  return response.data;
+}
+

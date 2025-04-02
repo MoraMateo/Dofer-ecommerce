@@ -52,7 +52,7 @@ export default async function ProfilePage() {
       </div>
 
       {/* Componente para actualizar la dirección de facturación */}
-      <UpdateBillingSection wooToken={user.wooToken} initialBilling={billing} />
+      <UpdateBillingSection wooToken={user.wooToken}  initialBilling={billing} userEmail={user.email} />
 
       {/* Sección de pedidos */}
       <div>

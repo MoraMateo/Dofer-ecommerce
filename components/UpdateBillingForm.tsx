@@ -1,4 +1,3 @@
-// components/UpdateBillingForm.tsx
 "use client";
 import React, { useState } from "react";
 
@@ -42,7 +41,7 @@ const UpdateBillingForm: React.FC<UpdateBillingFormProps> = ({ wooToken, userEma
         body: JSON.stringify({
           wooToken,
           billing,
-          email: userEmail, // Se envía el email del usuario
+          email: userEmail,
         }),
       });
       const data = await res.json();
@@ -50,7 +49,14 @@ const UpdateBillingForm: React.FC<UpdateBillingFormProps> = ({ wooToken, userEma
         setMessage("Dirección de facturación actualizada correctamente.");
         onUpdate(billing);
       } else {
-        setMessage(data.error || "Error al actualizar dirección.");
+        let errorMessage = "";
+        // Si data.error es un objeto, extraer su propiedad message, o usar JSON.stringify
+        if (typeof data.error === "object" && data.error !== null) {
+          errorMessage = data.error.message || JSON.stringify(data.error);
+        } else {
+          errorMessage = data.error || "Error al actualizar dirección.";
+        }
+        setMessage(errorMessage);
       }
     } catch (error: any) {
       console.error("Error en update-address:", error);

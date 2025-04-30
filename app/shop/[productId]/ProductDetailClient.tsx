@@ -40,7 +40,7 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
   return (
     <div className="container mx-auto px-4 py-10">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
-        {/* Imágenes */}
+        {/* Sección de imágenes */}
         <div className="space-y-4">
           <div className="w-full max-w-md mx-auto bg-gray-50 rounded-2xl shadow-lg overflow-hidden border border-gray-200 p-4">
             <Image
@@ -52,8 +52,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               priority
             />
           </div>
-
-
           {images.length > 1 && (
             <div className="flex gap-3 overflow-x-auto">
               {images.map((img, index) => (
@@ -75,10 +73,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           )}
         </div>
 
-        {/* Info producto */}
+        {/* Sección de información del producto */}
         <div className="flex flex-col space-y-4">
-          <h1 className="text-4xl font-extrabold text-gray-900">{product.name}</h1>
-
+          <h1 className="text-4xl font-bold text-dofer-blue mb-2">
+            {product.name}
+          </h1>
           <div className="text-3xl font-bold">
             {hasSale ? (
               <div className="flex items-center gap-3">
@@ -91,7 +90,6 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               <span className="text-dofer-blue">${finalPrice} MXN</span>
             )}
           </div>
-
           {product.stock_status && (
             <div className="text-sm font-medium">
               <span className={isInStock ? "text-green-600" : "text-red-500"}>
@@ -104,18 +102,15 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
               )}
             </div>
           )}
-
           {product.sku && (
             <p className="text-sm text-gray-500">SKU: {product.sku}</p>
           )}
-
           {product.short_description && (
             <div
               className="text-gray-700 text-base leading-relaxed"
               dangerouslySetInnerHTML={{ __html: product.short_description }}
             />
           )}
-
           {product.description && (
             <div
               className="prose prose-sm prose-dofer max-w-none text-gray-600"
@@ -126,12 +121,11 @@ export default function ProductDetailClient({ product }: ProductDetailClientProp
           {/* Acciones */}
           <div className="pt-6 flex flex-col sm:flex-row gap-4">
             <AddToCartButton product={product} />
-
             <Link
-              href="/shop"
+              href="/checkout"
               className="inline-block px-5 py-2 rounded-lg border border-dofer-blue text-dofer-blue hover:bg-dofer-blue hover:text-white transition-colors"
             >
-              Volver a la Tienda
+              Comprar ahora
             </Link>
           </div>
         </div>

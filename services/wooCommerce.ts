@@ -47,20 +47,15 @@ export async function getOrderStatus(orderId: string) {
  */
 export async function createOrder(orderData: any) {
   try {
-    console.log("Enviando orderData:", JSON.stringify(orderData, null, 2));
-    // Se utiliza la instancia 'api' que ya envía las claves de forma automática
+    console.log("🔔 Enviando a WooCommerce:", JSON.stringify(orderData, null, 2));
     const { data } = await api.post("/orders", orderData);
     return data;
   } catch (error: any) {
-    console.error("Error creating order:");
-    if (error.response) {
-      console.error("Status:", error.response.status);
-      console.error("Data:", JSON.stringify(error.response.data, null, 2));
-      console.error("Headers:", JSON.stringify(error.response.headers, null, 2));
-    } else {
-      console.error("Error message:", error.message);
-    }
-    return null;
+    // Si viene respuesta de Woo, la capturamos
+    const wooErr = error.response?.data;
+    console.error("❌ Error creating order:", wooErr || error.message);
+    // Lanza el objeto completo para que el route.ts lo reciba
+    throw wooErr || new Error(error.message);
   }
 }
 

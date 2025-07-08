@@ -1,6 +1,6 @@
-// components/CartPreview.tsx
 "use client";
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 
 export interface CartItem {
   id: number;
@@ -66,7 +66,14 @@ export default function CartPreview({ items }: CartPreviewProps) {
       <div className="space-y-4 mb-6">
         {items.map((item) => (
           <div key={item.id} className="flex items-center space-x-4 border-b pb-2">
-            <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded" />
+            <div className="relative w-16 h-16 rounded overflow-hidden">
+              <Image
+                src={item.image}
+                alt={item.name}
+                fill
+                className="object-cover"
+              />
+            </div>
             <div className="flex-1">
               <p className="font-semibold">{item.name}</p>
               <p className="text-sm text-gray-500">Cantidad: {item.quantity}</p>

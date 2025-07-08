@@ -3,8 +3,20 @@
 import { useCartStore, CartItem } from "@/store/cartStore";
 import toast from "react-hot-toast";
 
+interface ProductImage {
+  src: string;
+}
+
+export interface Product {
+  id: number | string;
+  name: string;
+  price: string;            // WooCommerce suele devolver precio como string
+  images?: ProductImage[];  // Array opcional de imágenes
+  // ...añade aquí otros campos si los necesitas
+}
+
 interface AddToCartButtonProps {
-  product: any;
+  product: Product;
 }
 
 /**
@@ -16,12 +28,10 @@ export default function AddToCartButton({ product }: AddToCartButtonProps) {
 
   const handleAdd = () => {
     const item: CartItem = {
-      id: product.id,
+      id: typeof product.id === "string" ? parseInt(product.id, 10) : product.id,
       name: product.name,
       price: parseFloat(product.price),
       quantity: 1,
-      // Aseguramos que si el producto tiene imágenes, 
-      // tomamos la primera como la "principal".
       image: product.images?.[0]?.src || "/placeholder.png",
     };
     addItem(item);

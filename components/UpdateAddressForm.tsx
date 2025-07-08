@@ -1,6 +1,6 @@
 // components/UpdateAddressForm.tsx
 "use client";
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 
 interface Address {
   first_name?: string;
@@ -25,7 +25,11 @@ export default function UpdateAddressForm({ wooToken, initialBilling, initialShi
   const [shipping, setShipping] = useState<Address>(initialShipping || {});
   const [message, setMessage] = useState<string>("");
 
-  const handleChange = (section: "billing" | "shipping", field: keyof Address, value: string) => {
+  const handleChange = (
+    section: "billing" | "shipping",
+    field: keyof Address,
+    value: string
+  ) => {
     if (section === "billing") {
       setBilling(prev => ({ ...prev, [field]: value }));
     } else {
@@ -33,31 +37,26 @@ export default function UpdateAddressForm({ wooToken, initialBilling, initialShi
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
 
     try {
       const res = await fetch("/api/update-address", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          wooToken,
-          billing,
-          shipping,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wooToken, billing, shipping }),
       });
       const data = await res.json();
       if (res.ok) {
         setMessage("Direcciones actualizadas correctamente.");
       } else {
-        setMessage(data.error || "Error al actualizar direcciones.");
+        setMessage(data.error ?? "Error al actualizar direcciones.");
       }
-    } catch (error: any) {
-      console.error("Error en update-address:", error);
-      setMessage("Error al actualizar direcciones.");
+    } catch (err: unknown) {
+      console.error("Error en update-address:", err);
+      const errorMsg = err instanceof Error ? err.message : String(err);
+      setMessage(errorMsg || "Error al actualizar direcciones.");
     }
   };
 
@@ -72,63 +71,63 @@ export default function UpdateAddressForm({ wooToken, initialBilling, initialShi
             type="text"
             placeholder="Nombre"
             value={billing.first_name || ""}
-            onChange={(e) => handleChange("billing", "first_name", e.target.value)}
+            onChange={e => handleChange("billing", "first_name", e.target.value)}
             className="border rounded px-3 py-2"
           />
           <input
             type="text"
             placeholder="Apellido"
             value={billing.last_name || ""}
-            onChange={(e) => handleChange("billing", "last_name", e.target.value)}
+            onChange={e => handleChange("billing", "last_name", e.target.value)}
             className="border rounded px-3 py-2"
           />
           <input
             type="text"
             placeholder="Dirección 1"
             value={billing.address_1 || ""}
-            onChange={(e) => handleChange("billing", "address_1", e.target.value)}
+            onChange={e => handleChange("billing", "address_1", e.target.value)}
             className="border rounded px-3 py-2 col-span-2"
           />
           <input
             type="text"
             placeholder="Dirección 2"
             value={billing.address_2 || ""}
-            onChange={(e) => handleChange("billing", "address_2", e.target.value)}
+            onChange={e => handleChange("billing", "address_2", e.target.value)}
             className="border rounded px-3 py-2 col-span-2"
           />
           <input
             type="text"
             placeholder="Ciudad"
             value={billing.city || ""}
-            onChange={(e) => handleChange("billing", "city", e.target.value)}
+            onChange={e => handleChange("billing", "city", e.target.value)}
             className="border rounded px-3 py-2"
           />
           <input
             type="text"
             placeholder="Código Postal"
             value={billing.postcode || ""}
-            onChange={(e) => handleChange("billing", "postcode", e.target.value)}
+            onChange={e => handleChange("billing", "postcode", e.target.value)}
             className="border rounded px-3 py-2"
           />
           <input
             type="text"
             placeholder="Estado"
             value={billing.state || ""}
-            onChange={(e) => handleChange("billing", "state", e.target.value)}
+            onChange={e => handleChange("billing", "state", e.target.value)}
             className="border rounded px-3 py-2"
           />
           <input
             type="text"
             placeholder="País"
             value={billing.country || ""}
-            onChange={(e) => handleChange("billing", "country", e.target.value)}
+            onChange={e => handleChange("billing", "country", e.target.value)}
             className="border rounded px-3 py-2"
           />
           <input
             type="text"
             placeholder="Teléfono"
             value={billing.phone || ""}
-            onChange={(e) => handleChange("billing", "phone", e.target.value)}
+            onChange={e => handleChange("billing", "phone", e.target.value)}
             className="border rounded px-3 py-2 col-span-2"
           />
         </div>
@@ -141,56 +140,56 @@ export default function UpdateAddressForm({ wooToken, initialBilling, initialShi
             type="text"
             placeholder="Nombre"
             value={shipping.first_name || ""}
-            onChange={(e) => handleChange("shipping", "first_name", e.target.value)}
+            onChange={e => handleChange("shipping", "first_name", e.target.value)}
             className="border rounded px-3 py-2"
           />
           <input
             type="text"
             placeholder="Apellido"
             value={shipping.last_name || ""}
-            onChange={(e) => handleChange("shipping", "last_name", e.target.value)}
+            onChange={e => handleChange("shipping", "last_name", e.target.value)}
             className="border rounded px-3 py-2"
           />
           <input
             type="text"
             placeholder="Dirección 1"
             value={shipping.address_1 || ""}
-            onChange={(e) => handleChange("shipping", "address_1", e.target.value)}
+            onChange={e => handleChange("shipping", "address_1", e.target.value)}
             className="border rounded px-3 py-2 col-span-2"
           />
           <input
             type="text"
             placeholder="Dirección 2"
             value={shipping.address_2 || ""}
-            onChange={(e) => handleChange("shipping", "address_2", e.target.value)}
+            onChange={e => handleChange("shipping", "address_2", e.target.value)}
             className="border rounded px-3 py-2 col-span-2"
           />
           <input
             type="text"
             placeholder="Ciudad"
             value={shipping.city || ""}
-            onChange={(e) => handleChange("shipping", "city", e.target.value)}
+            onChange={e => handleChange("shipping", "city", e.target.value)}
             className="border rounded px-3 py-2"
           />
           <input
             type="text"
             placeholder="Código Postal"
             value={shipping.postcode || ""}
-            onChange={(e) => handleChange("shipping", "postcode", e.target.value)}
+            onChange={e => handleChange("shipping", "postcode", e.target.value)}
             className="border rounded px-3 py-2"
           />
           <input
             type="text"
             placeholder="Estado"
             value={shipping.state || ""}
-            onChange={(e) => handleChange("shipping", "state", e.target.value)}
+            onChange={e => handleChange("shipping", "state", e.target.value)}
             className="border rounded px-3 py-2"
           />
           <input
             type="text"
             placeholder="País"
             value={shipping.country || ""}
-            onChange={(e) => handleChange("shipping", "country", e.target.value)}
+            onChange={e => handleChange("shipping", "country", e.target.value)}
             className="border rounded px-3 py-2"
           />
         </div>

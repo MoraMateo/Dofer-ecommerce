@@ -1,5 +1,6 @@
+// components/UpdateBillingForm.tsx
 "use client";
-import React, { useState } from "react";
+import React, { useState, FormEvent } from "react";
 
 export interface Billing {
   first_name?: string;
@@ -25,42 +26,40 @@ const UpdateBillingForm: React.FC<UpdateBillingFormProps> = ({ wooToken, userEma
   const [message, setMessage] = useState<string>("");
 
   const handleChange = (field: keyof Billing, value: string) => {
-    setBilling((prev) => ({ ...prev, [field]: value }));
+    setBilling(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setMessage("");
 
     try {
       const res = await fetch("/api/update-address", {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          wooToken,
-          billing,
-          email: userEmail,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ wooToken, billing, email: userEmail }),
       });
       const data = await res.json();
       if (res.ok) {
         setMessage("Dirección de facturación actualizada correctamente.");
         onUpdate(billing);
       } else {
-        let errorMessage = "";
-        // Si data.error es un objeto, extraer su propiedad message, o usar JSON.stringify
-        if (typeof data.error === "object" && data.error !== null) {
-          errorMessage = data.error.message || JSON.stringify(data.error);
+        let errorMessage: string;
+        const errorData = data.error;
+        if (typeof errorData === 'object' && errorData !== null) {
+          const errObj = errorData as Record<string, unknown>;
+          errorMessage = typeof errObj.message === 'string'
+            ? errObj.message
+            : JSON.stringify(errObj);
         } else {
-          errorMessage = data.error || "Error al actualizar dirección.";
+          errorMessage = String(errorData || "Error al actualizar dirección.");
         }
         setMessage(errorMessage);
       }
-    } catch (error: any) {
-      console.error("Error en update-address:", error);
-      setMessage("Error al actualizar dirección.");
+    } catch (err: unknown) {
+      console.error("Error en update-address:", err);
+      const errMsg = err instanceof Error ? err.message : String(err);
+      setMessage(errMsg || "Error al actualizar dirección.");
     }
   };
 
@@ -72,63 +71,63 @@ const UpdateBillingForm: React.FC<UpdateBillingFormProps> = ({ wooToken, userEma
           type="text"
           placeholder="Nombre"
           value={billing.first_name || ""}
-          onChange={(e) => handleChange("first_name", e.target.value)}
+          onChange={e => handleChange("first_name", e.target.value)}
           className="border rounded px-3 py-2"
         />
         <input
           type="text"
           placeholder="Apellido"
           value={billing.last_name || ""}
-          onChange={(e) => handleChange("last_name", e.target.value)}
+          onChange={e => handleChange("last_name", e.target.value)}
           className="border rounded px-3 py-2"
         />
         <input
           type="text"
           placeholder="Dirección 1"
           value={billing.address_1 || ""}
-          onChange={(e) => handleChange("address_1", e.target.value)}
+          onChange={e => handleChange("address_1", e.target.value)}
           className="border rounded px-3 py-2 col-span-2"
         />
         <input
           type="text"
           placeholder="Dirección 2 (opcional)"
           value={billing.address_2 || ""}
-          onChange={(e) => handleChange("address_2", e.target.value)}
+          onChange={e => handleChange("address_2", e.target.value)}
           className="border rounded px-3 py-2 col-span-2"
         />
         <input
           type="text"
           placeholder="Ciudad"
           value={billing.city || ""}
-          onChange={(e) => handleChange("city", e.target.value)}
+          onChange={e => handleChange("city", e.target.value)}
           className="border rounded px-3 py-2"
         />
         <input
           type="text"
           placeholder="Código Postal"
           value={billing.postcode || ""}
-          onChange={(e) => handleChange("postcode", e.target.value)}
+          onChange={e => handleChange("postcode", e.target.value)}
           className="border rounded px-3 py-2"
         />
         <input
           type="text"
           placeholder="Estado"
           value={billing.state || ""}
-          onChange={(e) => handleChange("state", e.target.value)}
+          onChange={e => handleChange("state", e.target.value)}
           className="border rounded px-3 py-2"
         />
         <input
           type="text"
           placeholder="País"
           value={billing.country || ""}
-          onChange={(e) => handleChange("country", e.target.value)}
+          onChange={e => handleChange("country", e.target.value)}
           className="border rounded px-3 py-2"
         />
         <input
           type="text"
           placeholder="Teléfono"
           value={billing.phone || ""}
-          onChange={(e) => handleChange("phone", e.target.value)}
+          onChange={e => handleChange("phone", e.target.value)}
           className="border rounded px-3 py-2 col-span-2"
         />
       </div>

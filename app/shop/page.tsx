@@ -1,9 +1,10 @@
+// File: app/shop/page.tsx
 import Image from "next/image";
 import Link from "next/link";
-import { getProducts } from "@/services/wooCommerce";
+import { getProducts, Product } from "@/services/wooCommerce";
 
 export default async function ShopPage() {
-  const products = await getProducts();
+  const products: Product[] = await getProducts();
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -19,7 +20,7 @@ export default async function ShopPage() {
 
       {/* Grid de tarjetas de productos */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-        {products.map((product: any) => (
+        {products.map((product: Product) => (
           <div
             key={product.id}
             className="bg-white rounded-2xl shadow-md hover:shadow-xl transition duration-300 transform hover:-translate-y-1 flex flex-col"
@@ -43,14 +44,13 @@ export default async function ShopPage() {
                 {new Intl.NumberFormat("es-MX", {
                   style: "currency",
                   currency: "MXN",
-                }).format(product.price)}
+                }).format(Number(product.price))}
               </p>
               <Link
                 href={`/shop/${product.id}`}
                 className="mt-auto inline-flex items-center justify-center gap-2 bg-dofer-blue text-white px-4 py-2 rounded-lg hover:bg-dofer-yellow hover:text-dofer-blue transition font-medium text-sm"
               >
                 Ver Detalle
-                {/* Heroicon: Arrow Right */}
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   className="h-4 w-4"

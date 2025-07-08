@@ -1,11 +1,19 @@
 import { getProducts } from "@/services/wooCommerce";
 import Link from "next/link";
 
+// Define la interfaz para los datos de producto
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+  // Agrega más propiedades si son necesarias
+}
+
 export default async function AdminProductsPage() {
-  const products = await getProducts();
+  const products: Product[] = await getProducts();
 
   return (
-    <div>
+    <div className="p-4">
       <h1 className="text-3xl font-bold text-dofer-blue mb-6">Listado de Productos</h1>
       <Link
         href="/admin/products/new"
@@ -14,7 +22,7 @@ export default async function AdminProductsPage() {
         Crear Producto
       </Link>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {products.map((product: any) => (
+        {products.map((product) => (
           <div key={product.id} className="bg-white rounded shadow p-4">
             <h2 className="text-xl font-semibold mb-2">{product.name}</h2>
             <p className="text-gray-600 mb-4">${product.price} MXN</p>

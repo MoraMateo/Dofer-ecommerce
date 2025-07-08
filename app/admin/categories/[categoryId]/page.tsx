@@ -4,14 +4,24 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getCategoryById, updateCategory } from "@/services/wooCommerce";
 
+// Define la forma de los datos de categoría que esperas recibir
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  // Añade aquí otras propiedades si las necesitas
+}
+
 export default function EditCategoryPage() {
   const router = useRouter();
   const { id } = useParams() as { id: string };
 
-  const [category, setCategory] = useState<any>(null);
-  const [name, setName] = useState("");
-  const [slug, setSlug] = useState("");
-  const [description, setDescription] = useState("");
+  // Usa un tipo concreto en lugar de 'any'
+  const [category, setCategory] = useState<Category | null>(null);
+  const [name, setName] = useState<string>("");
+  const [slug, setSlug] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
 
   useEffect(() => {
     async function fetchCategory() {
@@ -24,7 +34,7 @@ export default function EditCategoryPage() {
     fetchCategory();
   }, [id]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await updateCategory(id, { name, slug, description });

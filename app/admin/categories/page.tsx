@@ -1,8 +1,18 @@
 import { getCategories } from "@/services/wooCommerce";
 import Link from "next/link";
 
+// Define la forma de los datos de categoría
+interface Category {
+  id: number;
+  name: string;
+  slug: string;
+  count: number;
+  description?: string;
+}
+
 export default async function AdminCategoriesPage() {
-  const categories = await getCategories();
+  // Especifica el tipo concreto del array
+  const categories: Category[] = await getCategories();
 
   return (
     <div>
@@ -14,7 +24,7 @@ export default async function AdminCategoriesPage() {
         Crear Categoría
       </Link>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {categories.map((category: any) => (
+        {categories.map((category) => (
           <div key={category.id} className="bg-white rounded shadow p-4">
             <h2 className="text-xl font-semibold mb-2">{category.name}</h2>
             <p className="text-gray-600 mb-4">{category.count} productos</p>

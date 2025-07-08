@@ -4,13 +4,22 @@ import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { getProductById, updateProduct } from "@/services/wooCommerce";
 
+// Define la interfaz para los datos de producto
+interface Product {
+  id: number;
+  name: string;
+  price: string;
+  // Agrega aquí otras propiedades si lo requieres
+}
+
 export default function EditProductPage() {
   const router = useRouter();
   const { id } = useParams() as { id: string };
 
-  const [product, setProduct] = useState<any>(null);
-  const [name, setName] = useState("");
-  const [price, setPrice] = useState("");
+  // Tipado estricto en lugar de 'any'
+  const [product, setProduct] = useState<Product | null>(null);
+  const [name, setName] = useState<string>("");
+  const [price, setPrice] = useState<string>("");
 
   useEffect(() => {
     async function fetchProduct() {
@@ -22,7 +31,7 @@ export default function EditProductPage() {
     fetchProduct();
   }, [id]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       await updateProduct(id, { name, price });

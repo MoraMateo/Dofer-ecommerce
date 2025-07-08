@@ -1,4 +1,3 @@
-// File: app/api/orders/route.ts
 import { NextResponse } from 'next/server'
 import { createOrder } from '@/services/wooCommerce'
 
@@ -6,12 +5,7 @@ export async function POST(request: Request) {
   try {
     const payload = await request.json()
 
-    // Aquí ya viene en la forma que StripeForm envía:
-    // {
-    //   payment_method, payment_method_title, set_paid,
-    //   billing, shipping, line_items, (opcional) shipping_lines
-    // }
-
+    // payload con campos: payment_method, billing, shipping, line_items, etc.
     const data = await createOrder(payload)
 
     if (!data) {
@@ -22,10 +16,11 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json(data, { status: 200 })
-  } catch (err: any) {
-    console.error('Error en POST /api/orders:', err)
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    console.error('Error en POST /api/orders:', message)
     return NextResponse.json(
-      { error: err.message || 'Error creando la orden' },
+      { error: message || 'Error creando la orden' },
       { status: 500 }
     )
   }

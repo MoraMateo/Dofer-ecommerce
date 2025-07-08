@@ -8,8 +8,9 @@ export default function SignUpForm() {
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
     try {
       const res = await fetch("/api/register", {
         method: "POST",
@@ -17,7 +18,14 @@ export default function SignUpForm() {
         body: JSON.stringify({ email, password, name }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Error al registrar usuario");
+      if (!res.ok) {
+        const message = typeof data.error === 'string'
+          ? data.error
+          : (data.error instanceof Object && 'message' in data.error)
+            ? (data.error as Record<string, unknown>).message as string
+            : "Error al registrar usuario";
+        throw new Error(message);
+      }
 
       await signIn("credentials", {
         email,
@@ -25,8 +33,10 @@ export default function SignUpForm() {
         redirect: true,
         callbackUrl: "/dashboard",
       });
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      console.error("Error en registro:", err);
+      const message = err instanceof Error ? err.message : String(err);
+      setError(message);
     }
   };
 

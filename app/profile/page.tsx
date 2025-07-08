@@ -4,9 +4,15 @@ import { authOptions } from "@/lib/auth";
 import { getOrders, getWooCustomer } from "@/services/wooCommerce";
 import Link from "next/link";
 import { renderAddress } from "@/utils/renderAddress";
-
-// Importamos nuestro componente cliente:
 import UpdateBillingSection from "@/components/UpdateBillingSection";
+
+// Definimos el tipo para los pedidos
+interface WCOrder {
+  id: number;
+  status: string;
+  total: string;
+  date_created: string;
+}
 
 export default async function ProfilePage() {
   // Obtenemos la sesión en el servidor
@@ -25,7 +31,7 @@ export default async function ProfilePage() {
   }
 
   // Obtenemos los pedidos y datos de WooCommerce
-  const orders = await getOrders();
+  const orders = (await getOrders()) as WCOrder[];
   let wooCustomer = null;
   if (user.email) {
     wooCustomer = await getWooCustomer(user.email);
@@ -52,14 +58,18 @@ export default async function ProfilePage() {
       </div>
 
       {/* Componente para actualizar la dirección de facturación */}
-      <UpdateBillingSection wooToken={user.wooToken}  initialBilling={billing} userEmail={user.email} />
+      <UpdateBillingSection
+        wooToken={user.wooToken}
+        initialBilling={billing}
+        userEmail={user.email}
+      />
 
       {/* Sección de pedidos */}
       <div>
         <h2 className="text-2xl font-semibold mb-4">🛒 Mis Pedidos</h2>
         <div className="space-y-4">
-          {orders?.length > 0 ? (
-            orders.map((order: any) => (
+          {orders.length > 0 ? (
+            orders.map(order => (
               <Link
                 key={order.id}
                 href={`/profile/orders/${order.id}`}

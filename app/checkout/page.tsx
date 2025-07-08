@@ -1,7 +1,6 @@
-// File: app/checkout/page.tsx
-'use client'
+"use client"
 
-import React, { useState, useCallback, useEffect } from 'react'
+import React, { useState, useCallback } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { loadStripe } from '@stripe/stripe-js'
@@ -13,59 +12,69 @@ import PaymentForm, { OrderItem, ShippingInfo } from '@/components/PaymentForm'
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!)
 
 // helper para validar e-mail
-const isValidEmail = (email: string) =>
+const isValidEmail = (email: string): boolean =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
 export default function CheckoutPage() {
   const { items, clearCart } = useCartStore()
-  const [contactEmail,    setContactEmail]    = useState('')
-  const [subscribe,       setSubscribe]       = useState(true)
-  const [shipInfo,        setShipInfo]        = useState<ShippingInfo>({
-    name: '', phone: '', address1: '', address2: '',
-    city: '', state: '', postcode: '', country: 'MX',
+  const [contactEmail, setContactEmail] = useState<string>('')
+  const [subscribe, setSubscribe] = useState<boolean>(true)
+  const [shipInfo, setShipInfo] = useState<ShippingInfo>({
+    name: '',
+    phone: '',
+    address1: '',
+    address2: '',
+    city: '',
+    state: '',
+    postcode: '',
+    country: 'MX',
   })
-  const [shippingMethod,  setShippingMethod]  = useState<'envio'|'recoger'>('envio')
-  const [paymentMethod,   setPaymentMethod]   = useState<'tarjeta'|'paypal'|'transferencia'>('tarjeta')
-  const [selectedRate,    setSelectedRate]    = useState<Rate|null>(null)
+  const [shippingMethod, setShippingMethod] = useState<'envio' | 'recoger'>('envio')
+  const [paymentMethod, setPaymentMethod] = useState<'tarjeta' | 'paypal' | 'transferencia'>('tarjeta')
+  const [selectedRate, setSelectedRate] = useState<Rate | null>(null)
 
-  // 1) Totales
-  const subtotal     = items.reduce((s,i)=>s + i.price * i.quantity, 0)
-  const tax          = subtotal * 0.16
-  const shippingCost = shippingMethod === 'envio' && selectedRate
-    ? selectedRate.price
-    : 0
-  const total        = subtotal + tax + shippingCost
+  // Totales
+  const subtotal = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  const tax = parseFloat((subtotal * 0.16).toFixed(2))
+  const shippingCost = shippingMethod === 'envio' && selectedRate ? selectedRate.price : 0
+  const total = parseFloat((subtotal + tax + shippingCost).toFixed(2))
 
-  const handleSelectRate = useCallback((r: Rate) => {
-    setSelectedRate(r)
+  // Seleccionar tarifa
+  const handleSelectRate = useCallback((rate: Rate) => {
+    setSelectedRate(rate)
   }, [])
 
-  // 2) Mapeo para PaymentForm
+  // Items para formulario de pago
   const orderItems: OrderItem[] = items.map(i => ({
-    id:       i.id,
-    name:     i.name,
-    price:    i.price,
+    id: String(i.id),
+    name: i.name,
+    price: i.price,
     quantity: i.quantity,
   }))
 
-  // 3) Payload para ShippingOptions
-  const cartForAPI = items.map(i => ({
-    weight_kg: (i as any).weight || 0.5,
+  // Datos para ShippingOptions (peso fijo 0.5kg)
+  const cartForAPI = items.map(() => ({
+    weight_kg: 0.5,
     length_cm: 10,
-    width_cm:  10,
+    width_cm: 10,
     height_cm: 5,
   }))
 
   const addressComplete =
-    ['name','phone','address1','city','state','postcode']
-    .every(k => !!(shipInfo as any)[k])
+    Boolean(
+      shipInfo.name &&
+      shipInfo.phone &&
+      shipInfo.address1 &&
+      shipInfo.city &&
+      shipInfo.state &&
+      shipInfo.postcode
+    )
 
-  if (!items.length) {
+  // Carrito vacío
+  if (items.length === 0) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
-        <h1 className="text-3xl sm:text-4xl font-extrabold mb-6">
-          Tu carrito está vacío
-        </h1>
+        <h1 className="text-3xl sm:text-4xl font-extrabold mb-6">Tu carrito está vacío</h1>
         <Link href="/shop" className="px-6 py-3 bg-indigo-600 text-white rounded-md">
           Ir a la tienda
         </Link>
@@ -73,20 +82,16 @@ export default function CheckoutPage() {
     )
   }
 
-  const inputClass = `
-    block w-full border rounded-md px-3 py-2
-    focus:ring-2 focus:ring-indigo-500 sm:text-sm
-  `
+  const inputClass = `block w-full border rounded-md px-3 py-2 focus:ring-2 focus:ring-indigo-500 sm:text-sm`
 
   return (
     <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-3xl sm:text-4xl font-extrabold text-center mb-10">
-        Checkout
-      </h1>
+      <h1 className="text-3xl sm:text-4xl font-extrabold text-center mb-10">Checkout</h1>
 
       <div className="flex flex-col lg:flex-row lg:space-x-8">
         {/* MAIN FORM */}
         <main className="flex-1 space-y-8">
+
           {/* Contacto */}
           <section className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-2xl font-semibold mb-4">Contacto</h2>
@@ -101,12 +106,10 @@ export default function CheckoutPage() {
                   placeholder="tú@correo.com"
                 />
                 {contactEmail && !isValidEmail(contactEmail) && (
-                  <p className="text-red-500 text-sm mt-1">
-                    Ingresa un correo válido
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">Ingresa un correo válido</p>
                 )}
               </div>
-              <div className="flex items-center">
+              <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
                   checked={subscribe}
@@ -122,17 +125,17 @@ export default function CheckoutPage() {
           <section className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-2xl font-semibold mb-4">Envío</h2>
             <div className="flex flex-wrap gap-4 mb-4">
-              {(['envio','recoger'] as const).map(m => (
-                <label key={m} className="flex items-center gap-2">
+              {(['envio','recoger'] as const).map(method => (
+                <label key={method} className="flex items-center gap-2">
                   <input
                     type="radio"
                     name="shippingMethod"
-                    checked={shippingMethod === m}
-                    onChange={() => setShippingMethod(m)}
+                    checked={shippingMethod === method}
+                    onChange={() => setShippingMethod(method)}
                     className="form-radio text-indigo-600"
                   />
                   <span className="font-medium">
-                    {m === 'envio' ? 'Domicilio' : 'Recoger'}
+                    {method === 'envio' ? 'Domicilio' : 'Recoger'}
                   </span>
                 </label>
               ))}
@@ -156,11 +159,8 @@ export default function CheckoutPage() {
                       <label className="block mb-1">{label}</label>
                       <input
                         type="text"
-                        value={(shipInfo as any)[k]}
-                        onChange={e => setShipInfo({
-                          ...shipInfo,
-                          [k]: e.target.value
-                        })}
+                        value={shipInfo[k]}
+                        onChange={e => setShipInfo({ ...shipInfo, [k]: e.target.value })}
                         className={inputClass}
                       />
                     </div>
@@ -169,15 +169,9 @@ export default function CheckoutPage() {
                 <div className="bg-gray-50 p-4 rounded">
                   <h3 className="font-medium mb-2">Método de envío</h3>
                   {addressComplete ? (
-                    <ShippingOptions
-                      shippingInfo={shipInfo}
-                      cart={cartForAPI}
-                      onSelect={handleSelectRate}
-                    />
+                    <ShippingOptions shippingInfo={shipInfo} cart={cartForAPI} onSelect={handleSelectRate} />
                   ) : (
-                    <p className="text-gray-600">
-                      Completa los datos para ver tarifas
-                    </p>
+                    <p className="text-gray-600">Completa los datos para ver tarifas</p>
                   )}
                 </div>
               </>
@@ -188,29 +182,19 @@ export default function CheckoutPage() {
           <section className="bg-white p-6 rounded-lg shadow">
             <h2 className="text-2xl font-semibold mb-4">Pago</h2>
             <div className="flex gap-4 mb-6">
-              {(['tarjeta','paypal','transferencia'] as const).map(m => (
-                <label
-                  key={m}
-                  className={`px-4 py-2 border rounded cursor-pointer ${
-                    paymentMethod===m
-                      ? 'border-indigo-600 bg-indigo-50'
-                      : 'border-gray-300'
-                  }`}
-                >
+              {(['tarjeta','paypal','transferencia'] as const).map(method => (
+                <label key={method} className={`px-4 py-2 border rounded cursor-pointer ${paymentMethod===method ? 'border-indigo-600 bg-indigo-50' : 'border-gray-300'}`}>
                   <input
                     type="radio"
                     name="paymentMethod"
-                    checked={paymentMethod===m}
-                    onChange={() => setPaymentMethod(m)}
+                    checked={paymentMethod===method}
+                    onChange={() => setPaymentMethod(method)}
                     className="form-radio"
                   />
-                  <span className="ml-2">
-                    {m==='tarjeta'?'Tarjeta':m==='paypal'?'PayPal':'Transferencia'}
-                  </span>
+                  <span className="ml-2">{method==='tarjeta' ? 'Tarjeta' : method==='paypal' ? 'PayPal' : 'Transferencia'}</span>
                 </label>
               ))}
             </div>
-
             {paymentMethod==='tarjeta' && isValidEmail(contactEmail) && (
               <Elements stripe={stripePromise}>
                 <PaymentForm
@@ -222,13 +206,9 @@ export default function CheckoutPage() {
                 />
               </Elements>
             )}
-
             {paymentMethod==='paypal' && (
-              <button className="w-full py-3 bg-yellow-500 text-white rounded">
-                Pagar con PayPal
-              </button>
+              <button className="w-full py-3 bg-yellow-500 text-white rounded">Pagar con PayPal</button>
             )}
-
             {paymentMethod==='transferencia' && (
               <div className="text-gray-700">
                 <p>Transferencia a:</p>
@@ -237,12 +217,11 @@ export default function CheckoutPage() {
                   <li>Cuenta 1234567890</li>
                   <li>CLABE 012345678901234567</li>
                 </ul>
-                <p className="mt-2 text-sm">
-                  Envía comprobante a pagos@dofer.com
-                </p>
+                <p className="mt-2 text-sm">Envía comprobante a pagos@dofer.com</p>
               </div>
             )}
           </section>
+
         </main>
 
         {/* SIDEBAR DE RESUMEN */}
@@ -250,57 +229,43 @@ export default function CheckoutPage() {
           <section className="bg-white p-6 rounded-lg shadow sticky top-20">
             <h2 className="text-2xl font-semibold mb-4">Tu Pedido</h2>
             <div className="space-y-4 mb-4">
-              {items.map(i => (
-                <div key={i.id} className="flex items-center gap-4">
-                  <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden relative">
-                    <Image
-                      src={i.image || '/placeholder.png'}
-                      alt={i.name}
-                      fill
-                      className="object-cover"
-                    />
+              {items.map(i => {
+                const line = i.price * i.quantity
+                return (
+                  <div key={i.id} className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden relative">
+                      <Image src={i.image || '/placeholder.png'} alt={i.name} fill className="object-cover" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">{i.name}</p>
+                      <p className="text-sm text-gray-500">x{i.quantity}</p>
+                    </div>
+                    <p className="font-semibold">${line.toFixed(2)}</p>
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{i.name}</p>
-                    <p className="text-sm text-gray-500">x{i.quantity}</p>
-                  </div>
-                  <p className="font-semibold">
-                    ${(i.price * i.quantity).toFixed(2)}
-                  </p>
-                </div>
-              ))}
+                )
+              })}
             </div>
             <div className="border-t pt-4 space-y-2">
-              <div className="flex justify-between">
-                <span>Subtotal</span><span>${subtotal.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>IVA (16%)</span><span>${tax.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between">
-                <span>Envío</span><span>${shippingCost.toFixed(2)}</span>
-              </div>
-              <div className="flex justify-between font-bold text-lg">
-                <span>Total</span><span>${total.toFixed(2)}</span>
-              </div>
+              <div className="flex justify-between"><span>Subtotal</span><span>${subtotal.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span>IVA (16%)</span><span>${tax.toFixed(2)}</span></div>
+              <div className="flex justify-between"><span>Envío</span><span>${shippingCost.toFixed(2)}</span></div>
+              <div className="flex justify-between font-bold text-lg"><span>Total</span><span>${total.toFixed(2)}</span></div>
             </div>
             {paymentMethod!=='tarjeta' && (
-              <button
-                onClick={()=>{
-                  if (shippingMethod==='envio' && !selectedRate) {
-                    alert('Selecciona tarifa de envío')
-                    return
-                  }
-                  alert(`Procesando via ${paymentMethod}`)
-                  clearCart()
-                }}
-                className="w-full mt-4 py-3 bg-indigo-600 text-white rounded"
-              >
-                {paymentMethod==='paypal'?'Pagar con PayPal':'Finalizar Pedido'}
+              <button onClick={() => {
+                if (shippingMethod==='envio' && !selectedRate) {
+                  alert('Selecciona tarifa de envío')
+                  return
+                }
+                alert(`Procesando via ${paymentMethod}`)
+                clearCart()
+              }} className="w-full mt-4 py-3 bg-indigo-600 text-white rounded">
+                {paymentMethod==='paypal' ? 'Pagar con PayPal' : 'Finalizar Pedido'}
               </button>
             )}
           </section>
         </aside>
+
       </div>
     </div>
   )

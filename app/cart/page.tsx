@@ -6,7 +6,8 @@ import Image from "next/image";
 import { Trash2, ShoppingCart } from "lucide-react";
 
 export default function CartPage() {
-  const { items, removeItem, clearCart } = useCartStore();
+  // Eliminamos clearCart porque no se usa
+  const { items, removeItem } = useCartStore();
   const total = items.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   const handleRemove = (id: number) => {
@@ -28,11 +29,10 @@ export default function CartPage() {
           </Link>
           <Link
             href="/checkout"
-            className="bg-dofer-blue text-white px-5 py-2.5 rounded-lg hover:bg-dofer-yellow hover:text-dofer-blue transition font-medium text-sm"
+            className="bg-dofer-blue text-white px-5 py-2.5 rounded-lg hover:bg-dofer-yellow hover:text-dofer-blue transition font-medium text-sm ml-4"
           >
             Ir a Checkout
           </Link>
-
         </div>
       </div>
     );
